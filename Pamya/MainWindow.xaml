@@ -1,0 +1,38 @@
+﻿<Window x:Class="Pamya.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pamya" Height="600" Width="800" KeyUp="my_text_KeyUp">
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom" Height="24">
+            <StatusBarItem Height="24">
+                <TextBlock Name="lblStatus" Text=""/>
+            </StatusBarItem>
+        </StatusBar>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Click="_open_dialog" />
+                <MenuItem Header="_Import" Click="_import_dialog" />
+                <Separator />
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="_Options">
+                <MenuItem x:Name="review_only" Header="_Review Only"  IsCheckable="True" Click="_toggle_review_only"/>
+            </MenuItem>
+        </Menu>
+
+        <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
+
+            <TextBlock Name="questionBlock" FontSize="32" Height="446" TextWrapping="Wrap" Margin="0,0,0.333,0"></TextBlock>
+        </StackPanel>
+        <!--<StackPanel FocusManager.FocusedElement="{Binding ElementName=TBox}" DockPanel.Dock="Bottom">
+            <Grid>
+                <TextBox x:Name="TBox" Margin="5" VerticalAlignment="Center" Text="" FontSize="32" AcceptsReturn="False"/>
+            </Grid>
+        </StackPanel>-->
+        <TextBox x:Name="TBox" Margin="5,0,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>
+        <!--<WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
+            <Button Name="btnOpenFile" Click="Test">Test</Button>
+        </WrapPanel>-->
+
+    </DockPanel>
+</Window>
