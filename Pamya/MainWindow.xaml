@@ -13,7 +13,7 @@
                 <MenuItem Header="_Open" Click="_open_dialog" />
                 <MenuItem Header="_Import" Click="_import_dialog" />
                 <Separator />
-                <MenuItem Header="_Exit" />
+                <MenuItem Header="_Exit" Click="_app_exit" />
             </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem x:Name="review_only" Header="_Review Only"  IsCheckable="True" Click="_toggle_review_only"/>
@@ -22,14 +22,14 @@
 
         <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
 
-            <TextBlock Name="questionBlock" FontSize="32" Height="446" TextWrapping="Wrap" Margin="0,0,0.333,0"></TextBlock>
+            <TextBlock Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="0,0,0,0" Text = "{Binding LongText}"></TextBlock>
         </StackPanel>
         <!--<StackPanel FocusManager.FocusedElement="{Binding ElementName=TBox}" DockPanel.Dock="Bottom">
             <Grid>
                 <TextBox x:Name="TBox" Margin="5" VerticalAlignment="Center" Text="" FontSize="32" AcceptsReturn="False"/>
             </Grid>
         </StackPanel>-->
-        <TextBox x:Name="TBox" Margin="5,0,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>
+        <TextBox x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>
         <!--<WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
             <Button Name="btnOpenFile" Click="Test">Test</Button>
         </WrapPanel>-->
