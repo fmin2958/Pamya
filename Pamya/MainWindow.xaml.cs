@@ -19,6 +19,8 @@ using System.Media;
 using System.Net;
 using System.Data.SQLite;
 
+//THIS CODE IS A MESS
+
 
 namespace Pamya
 {
@@ -125,6 +127,7 @@ namespace Pamya
                 }
 
                 stuff = String.Join("\n", deckstuff);
+                //Console.Write(stuff);
                 //for 
                 mc.fillDeckFromString(stuff);
                 show_deck();
@@ -236,9 +239,8 @@ namespace Pamya
             questionBlock.Text = currentWord.question;
             changeStatusBar();
         }
-        private void my_text_KeyUp(object sender, KeyEventArgs e)
+        private void _key_press(object sender, KeyEventArgs e)
         {
-            //handler codes go here as needed.
             if (e.Key == Key.Enter)
             {
                 //do something if 'enter' key is pressed.
@@ -388,19 +390,24 @@ namespace Pamya
 
                 //get all the cards past due and randomise them
                 studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch)).ToList();
+                //studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch + 600)).ToList();
                 studyList.Shuffle();
 
                 //append all cards that will be due in 10 minutes or less randomised
                 var willBeDue = studiedCards.Where(x => (x.timeDue <= (secondsSinceEpoch + 600)) && (x.timeDue > (secondsSinceEpoch))).ToList();
                 willBeDue.Shuffle();
                 studyList.AddRange(willBeDue);
+
                 //studyList.Shuffle();
 
                 //Add new cards too at the start
                 if (studyList.Count < 5 && (! _review_only))
                 {
                     studyList.Reverse();
-                    studyList.AddRange(dc.Where(x => x.studied == false).ToList().Take(1));
+                    var nextCards = dc.Where(x => x.studied == false).ToList();
+                    nextCards = nextCards.OrderBy(o => o.id).ToList();
+                    studyList.AddRange(nextCards.Take(1));
+                    //MessageBox.Show(dc.Where(x => x.studied == false).ToList().Take(1).ToString());
                     studyList.Reverse();
                 }
                 
@@ -457,7 +464,7 @@ namespace Pamya
         public bool studied;
         public int timeDue;
 
-        public string id;
+        public int id;
         public string wavfileloc;
         public Word(string q,string a)
         {
@@ -469,7 +476,7 @@ namespace Pamya
             studied = false;
             timeDue = 0;
 
-            id = "";
+            id = 0;
             wavfileloc = "";
 
         }
@@ -483,7 +490,7 @@ namespace Pamya
             studied = Convert.ToBoolean(s);
             timeDue = Convert.ToInt32(t);
 
-            id = "";
+            id = 0;
             wavfileloc = "";
         }
         public Word(string idd,string q, string a, string e, string i, string nnn, string s, string t, string wav)
@@ -496,7 +503,7 @@ namespace Pamya
             studied = Convert.ToBoolean(s);
             timeDue = Convert.ToInt32(t);
 
-            id = idd;
+            id = Convert.ToInt32(idd);
             wavfileloc = wav;
         }
         private uint editDistance(string s,string t)

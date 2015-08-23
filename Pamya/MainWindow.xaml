@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Pamya.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Pamya" Height="600" Width="800" KeyUp="my_text_KeyUp">
+        Title="Pamya" Height="600" Width="800" KeyUp="_key_press">
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" Height="24">
             <StatusBarItem Height="24">
