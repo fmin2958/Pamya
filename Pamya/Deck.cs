@@ -63,7 +63,6 @@ namespace Pamya
 
                 //get all the cards past due and randomise them
                 studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch)).ToList();
-                //studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch + 600)).ToList();
                 studyList.Shuffle();
 
                 //append all cards that will be due in 10 minutes or less randomised
@@ -71,16 +70,14 @@ namespace Pamya
                 willBeDue.Shuffle();
                 studyList.AddRange(willBeDue);
 
-                //studyList.Shuffle();
 
-                //Add new cards too at the start
+                //Add new cards too at the start only if _review_only is false
                 if (studyList.Count < 5 && (!_review_only))
                 {
                     studyList.Reverse();
                     var nextCards = dc.Where(x => x.studied == false).ToList();
                     nextCards = nextCards.OrderBy(o => o.id).ToList();
                     studyList.AddRange(nextCards.Take(1));
-                    //MessageBox.Show(dc.Where(x => x.studied == false).ToList().Take(1).ToString());
                     studyList.Reverse();
                 }
 
