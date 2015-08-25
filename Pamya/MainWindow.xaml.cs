@@ -284,23 +284,27 @@ namespace Pamya
                     //
 
                     //update the database
-                    SQLiteConnection userdbcon;
-                    userdbcon =
-                    new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
-                    userdbcon.Open();
-                    string sql = "update deck set EF='" + currentWord.EF + "', I='" + currentWord.I + "', n='" + currentWord.n +
-                        "', studied='" + currentWord.studied + "', timedue='" + currentWord.timeDue + "' where guid='" + currentWord.id + "';";
-                    //MessageBox.Show(sql);
-                    var command = new SQLiteCommand(sql, userdbcon);
-                    try
+                    if (File.Exists(iuserfile))
                     {
-                        command.ExecuteNonQuery();
-                    } catch(Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
+                        SQLiteConnection userdbcon;
+                        userdbcon =
+                        new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
+                        userdbcon.Open();
+                        string sql = "update deck set EF='" + currentWord.EF + "', I='" + currentWord.I + "', n='" + currentWord.n +
+                            "', studied='" + currentWord.studied + "', timedue='" + currentWord.timeDue + "' where rowid=" + currentWord.id + ";";
+                        //MessageBox.Show(sql);
+                        var command = new SQLiteCommand(sql, userdbcon);
+                        try
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
 
-                    userdbcon.Close();
+                        userdbcon.Close();
+                    }
 
                 }
                 else

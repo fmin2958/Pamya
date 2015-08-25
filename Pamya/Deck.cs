@@ -52,21 +52,18 @@ namespace Pamya
         {
             if (studyList.Count == 0)
             {
-                //n += 1;
-                //studyOrder = dc.OrderBy(o => o.I).ToList();
                 TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
                 int secondsSinceEpoch = (int)t.TotalSeconds;
+
                 //get all cards already studied
                 var studiedCards = dc.Where(x => x.studied == true).ToList();
-                //out of those get all cards due
-                //studyList = studyList.Where(x => x.timeDue <= (secondsSinceEpoch + 900)).ToList();
 
                 //get all the cards past due and randomise them
                 studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch)).ToList();
                 studyList.Shuffle();
 
-                //append all cards that will be due in 10 minutes or less randomised
-                var willBeDue = studiedCards.Where(x => (x.timeDue <= (secondsSinceEpoch + 600)) && (x.timeDue > (secondsSinceEpoch))).ToList();
+                //append all cards that will be due in 60 minutes or less randomised
+                var willBeDue = studiedCards.Where(x => (x.timeDue <= (secondsSinceEpoch + 3600)) && (x.timeDue > (secondsSinceEpoch))).ToList();
                 willBeDue.Shuffle();
                 studyList.AddRange(willBeDue);
 

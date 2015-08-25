@@ -105,7 +105,7 @@ namespace Pamya
             }
             else if (nnn == 4)
             {
-                return 4d;
+                return 6d;
             }
             else
             {
@@ -125,7 +125,7 @@ namespace Pamya
 
             if (q < 4)
             {
-                EFchange(3);
+                EFchange(q);
                 I = 1d;
                 n = 1;
             }
@@ -142,13 +142,13 @@ namespace Pamya
                 if (n > 3)
                     EFchange(q);
 
-                n -= 1;
+                n -= 3;
                 if (n < 1) { n = 1; }
                 I = Ifactor(n);
             }
             TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
             int secondsSinceEpoch = (int)t.TotalSeconds;
-            timeDue = secondsSinceEpoch + Convert.ToInt32(I * 60 * 2.5);
+            timeDue = secondsSinceEpoch + Convert.ToInt32(I * 60 * 4.5);
             studied = true;
 
             if (q == 5) { return true; } else { return false; }
