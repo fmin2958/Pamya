@@ -15,6 +15,9 @@
                 <Separator />
                 <MenuItem Header="_Exit" Click="_app_exit" />
             </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem x:Name="card" Header="_Card"  Click="_edit_card_window_open"/>
+            </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem x:Name="review_only" Header="_Review Only"  IsCheckable="True" Click="_toggle_review_only"/>
             </MenuItem>

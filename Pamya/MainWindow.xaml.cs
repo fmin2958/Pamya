@@ -120,14 +120,14 @@ namespace Pamya
 
                 List<string> deckstuff = new List<string>();
 
-                string sql = "select * from deck order by guid asc";
+                string sql = "select rowid,* from deck order by rowid asc";
                 SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
                 SQLiteDataReader deckreader = command.ExecuteReader();
                 SQLiteCommand usercommand = new SQLiteCommand(sql, userdbcon);
                 SQLiteDataReader userreader = usercommand.ExecuteReader();
                 while (deckreader.Read() && userreader.Read())
                 {
-                    deckstuff.Add(deckreader["guid"] + "|" + deckreader["question"] + "|" + deckreader["answer"] + "|" +
+                    deckstuff.Add(deckreader["rowid"].ToString() + "|" + deckreader["question"] + "|" + deckreader["answer"] + "|" +
                         userreader["ef"] + "|" + userreader["i"] + "|" + userreader["n"] + "|" + userreader["studied"] + "|" + userreader["timedue"] + "|" + deckreader["wavfileloc"]);
                 }
 
@@ -284,27 +284,7 @@ namespace Pamya
                     //
 
                     //update the database
-                    if (File.Exists(iuserfile))
-                    {
-                        SQLiteConnection userdbcon;
-                        userdbcon =
-                        new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
-                        userdbcon.Open();
-                        string sql = "update deck set EF='" + currentWord.EF + "', I='" + currentWord.I + "', n='" + currentWord.n +
-                            "', studied='" + currentWord.studied + "', timedue='" + currentWord.timeDue + "' where rowid=" + currentWord.id + ";";
-                        //MessageBox.Show(sql);
-                        var command = new SQLiteCommand(sql, userdbcon);
-                        try
-                        {
-                            command.ExecuteNonQuery();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.ToString());
-                        }
-
-                        userdbcon.Close();
-                    }
+                    update_db();
 
                 }
                 else
@@ -317,6 +297,32 @@ namespace Pamya
                 }
             }
         }
+
+        public void update_db()
+        {
+            if (File.Exists(iuserfile))
+            {
+                SQLiteConnection userdbcon;
+                userdbcon =
+                new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
+                userdbcon.Open();
+                string sql = "update deck set EF='" + currentWord.EF + "', I='" + currentWord.I + "', n='" + currentWord.n +
+                    "', studied='" + currentWord.studied + "', timedue='" + currentWord.timeDue + "' where rowid=" + currentWord.id + ";";
+                //MessageBox.Show(sql);
+                var command = new SQLiteCommand(sql, userdbcon);
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+
+                userdbcon.Close();
+            }
+        }
+
         public void ttsEO(string w)
         {
             System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -342,6 +348,16 @@ namespace Pamya
             var timeD = epoch.AddSeconds(currentWord.timeDue);
             lblStatus.Text = "EF: " + currentWord.EF.ToString() + "; n: " + currentWord.n.ToString() + "; Time Due Next: " + timeD.ToLocalTime().ToLongDateString() + " " + timeD.ToLocalTime().ToLongTimeString();
         }
+
+        private void _edit_card_window_open(object sender, RoutedEventArgs e)
+        {
+            var edit_window = new EditCardWindow(currentWord);
+            edit_window.ShowDialog();
+            questionBlock.Text = currentWord.question;
+            update_db();
+            changeStatusBar();
+        }
+
     }
 
 
