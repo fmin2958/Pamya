@@ -18,6 +18,7 @@ using System.Security.Cryptography;
 using System.Media;
 using System.Net;
 using System.Data.SQLite;
+using System.IO.Compression;
 
 //THIS CODE IS A MESS
 
@@ -67,7 +68,7 @@ namespace Pamya
         public MainWindow()
         {
             mc = new Deck();
-            currentWord = new Word("fuck", "you");
+            currentWord = new Word("retard", "malfruiĝulo");
 
             //Console.WriteLine(sky.EditDistance("Saturday", "Sunday"));
             InitializeComponent();
@@ -249,7 +250,7 @@ namespace Pamya
                     command = new SQLiteCommand(sql, deckdbcon);
                     try {
                         command.ExecuteNonQuery();
-                         } catch (Exception ex)
+                         } catch
                     {
                         //MessageBox.Show(ex.ToString());
                         MessageBox.Show(sql);
@@ -267,6 +268,63 @@ namespace Pamya
             }
 
         }
+
+        private void _ImportFromZipDialog(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                filename = openFileDialog.FileName;
+
+                var deckfolder = appdatafolder + @"\Decks\" + System.IO.Path.GetFileNameWithoutExtension(filename);
+                var deckfile = deckfolder + @"\deck.sqlite";
+
+                var userfile = deckfolder + @"\userdata.sqlite";
+
+                Directory.CreateDirectory(deckfolder);
+
+                File.Create(appdatafolder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
+
+                //Extract the zip file
+                ZipFile.ExtractToDirectory(filename, deckfolder);
+
+                SQLiteConnection deckdbcon;
+                deckdbcon =
+                new SQLiteConnection("Data Source=" + deckfile + ";Version=3;");
+                deckdbcon.Open();
+
+                SQLiteConnection.CreateFile(userfile);
+                SQLiteConnection userdbcon;
+                userdbcon =
+                new SQLiteConnection("Data Source=" + userfile + ";Version=3;");
+                userdbcon.Open();
+                var sql = "create table deck (guid text,EF text,I text, n text, studied text, timedue text)";
+                var command = new SQLiteCommand(sql, userdbcon);
+                command.ExecuteNonQuery();
+
+                sql = "select rowid,* from deck order by rowid asc";
+                command = new SQLiteCommand(sql, deckdbcon);
+                SQLiteDataReader deckreader = command.ExecuteReader();
+                Word w = new Word("Test", "Test");
+                while (deckreader.Read())
+                {
+                    
+                    sql = "insert into deck values('" + deckreader["rowid"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.timeDue.ToString() + "');";
+                    //MessageBox.Show(sql);
+                    command = new SQLiteCommand(sql, userdbcon);
+                    command.ExecuteNonQuery();
+                }
+                deckreader.Close();
+
+
+
+                deckdbcon.Close();
+                userdbcon.Close();
+            }
+
+        }
+
+
         private void ShowDeck()
         {
             currentWord = mc.GetNextWord(_review_only);
@@ -312,7 +370,7 @@ namespace Pamya
                     //
 
                     //update the database
-                    update_db();
+                    UpdateUserDB();
 
                 }
                 else
@@ -326,7 +384,7 @@ namespace Pamya
             }
         }
 
-        public void update_db()
+        public void UpdateUserDB()
         {
             if (File.Exists(iuserfile))
             {
@@ -336,6 +394,29 @@ namespace Pamya
                 userdbcon.Open();
                 string sql = "update deck set EF='" + currentWord.EF + "', I='" + currentWord.I + "', n='" + currentWord.n +
                     "', studied='" + currentWord.studied + "', timedue='" + currentWord.timeDue + "' where rowid=" + currentWord.id + ";";
+                //MessageBox.Show(sql);
+                var command = new SQLiteCommand(sql, userdbcon);
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+
+                userdbcon.Close();
+            }
+        }
+        public void UpdateDeckDB()
+        {
+            if (File.Exists(iuserfile))
+            {
+                SQLiteConnection userdbcon;
+                userdbcon =
+                new SQLiteConnection("Data Source=" + ideckfile + ";Version=3;");
+                userdbcon.Open();
+                string sql = "update deck set question='" + currentWord.question.Replace("'", "''") + "', answer='" + currentWord.answer.Replace("'", "''") + "' where rowid=" + currentWord.id + ";";
                 //MessageBox.Show(sql);
                 var command = new SQLiteCommand(sql, userdbcon);
                 try
@@ -383,20 +464,20 @@ namespace Pamya
             var edit_window = new EditCardWindow(currentWord);
             edit_window.ShowDialog();
             questionBlock.Text = currentWord.question;
-            update_db();
+            UpdateDeckDB();
             UpdateStatusBar();
         }
 
         private void _MarkAsEasy(object sender, RoutedEventArgs e)
         {
             currentWord.MarkAsEasy();
-            update_db();
+            UpdateUserDB();
             UpdateStatusBar();
         }
         private void _MarkAsHard(object sender, RoutedEventArgs e)
         {
             currentWord.MarkAsHard();
-            update_db();
+            UpdateUserDB();
             UpdateStatusBar();
         }
     }

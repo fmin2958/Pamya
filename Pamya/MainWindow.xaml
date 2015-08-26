@@ -26,7 +26,8 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="Open" />
-                <MenuItem Header="_Import" Click="_import_dialog" />
+                <MenuItem Header="Import from _Text" Click="_import_dialog" />
+                <MenuItem Header="Import from _Zip" Click="_ImportFromZipDialog" />
                 <Separator />
                 <MenuItem Header="_Exit" Click="_app_exit" />
             </MenuItem>
