@@ -146,12 +146,33 @@ namespace Pamya
                 if (n < 1) { n = 1; }
                 I = Ifactor(n);
             }
-            TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            int secondsSinceEpoch = (int)t.TotalSeconds;
-            timeDue = secondsSinceEpoch + Convert.ToInt32(I * 60 * 4.5);
+
+            SetNextDueDate();
             studied = true;
 
             if (q == 5) { return true; } else { return false; }
+        }
+
+        public void SetNextDueDate()
+        {
+            int secondsSinceEpoch = EpochTime.GetAsInt();
+            timeDue = secondsSinceEpoch + Convert.ToInt32(I * 60 * 4.5);
+        }
+
+        public void MarkAsEasy()
+        {
+            EF = (EF > 3.5) ? EF : 3.5;
+            n = (n > 10) ? n : 10;
+            I = Ifactor(n);
+            SetNextDueDate();
+        }
+
+        public void MarkAsHard()
+        {
+            EF = 1.3;
+            n = 1;
+            I = Ifactor(n);
+            SetNextDueDate();
         }
 
         public override string ToString()

@@ -43,17 +43,12 @@ namespace Pamya
             }
         }
 
-        public string getQ(int nnn)
+        public Word GetNextWord(Boolean _review_only)
         {
-            return dc[nnn].question;
-        }
-
-        public Word getNextWord(Boolean _review_only)
-        {
+            const int _TIME_TO_LOOK_AHEAD = 3300; //55 minutes
             if (studyList.Count == 0)
             {
-                TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-                int secondsSinceEpoch = (int)t.TotalSeconds;
+                int secondsSinceEpoch = EpochTime.GetAsInt();
 
                 //get all cards already studied
                 var studiedCards = dc.Where(x => x.studied == true).ToList();
@@ -62,8 +57,8 @@ namespace Pamya
                 studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch)).ToList();
                 studyList.Shuffle();
 
-                //append all cards that will be due in 60 minutes or less randomised
-                var willBeDue = studiedCards.Where(x => (x.timeDue <= (secondsSinceEpoch + 3600)) && (x.timeDue > (secondsSinceEpoch))).ToList();
+                //append all cards that will be due in _TIME_TO_LOOK_AHEAD seconds or less randomised
+                var willBeDue = studiedCards.Where(x => (x.timeDue <= (secondsSinceEpoch + _TIME_TO_LOOK_AHEAD)) && (x.timeDue > (secondsSinceEpoch))).ToList();
                 willBeDue.Shuffle();
                 studyList.AddRange(willBeDue);
 

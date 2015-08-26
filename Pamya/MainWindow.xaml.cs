@@ -27,6 +27,32 @@ namespace Pamya
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+    static class CustomCommands
+    {
+        public static RoutedCommand EditCard = new RoutedCommand();
+        public static RoutedCommand MarkAsEasy = new RoutedCommand();
+        public static RoutedCommand MarkAsHard = new RoutedCommand();
+        public static RoutedCommand ToggleReviewOnly = new RoutedCommand();
+    }
+
+    static class EpochTime
+    {
+        public static DateTime GetCurrent()
+        {
+            return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        }
+        public static int GetAsInt()
+        {
+            TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
+            return (int)t.TotalSeconds;
+        }
+        public static DateTime AddToEpoch(int seconds)
+        {
+            return (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).AddSeconds(seconds);
+        }
+    }
+
     public partial class MainWindow : Window
     {
         public Deck mc;
@@ -74,10 +100,12 @@ namespace Pamya
             }
         }
 
-        private void _toggle_review_only(object sender, RoutedEventArgs e)
+        private void _ToggleReviewOnly(object sender, RoutedEventArgs e)
         {
 
             _review_only = !_review_only;
+            UpdateStatusBar();
+            ReviewOnlyMenuItem.IsChecked = _review_only;
         }
 
 
@@ -86,7 +114,7 @@ namespace Pamya
             Application.Current.Shutdown();
         }
 
-        private void _open_dialog(object sender, RoutedEventArgs e)
+        private void _OpenDialog(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = appdatafolder + @"\Links";
@@ -135,7 +163,7 @@ namespace Pamya
                 //Console.Write(stuff);
                 //for 
                 mc.fillDeckFromString(stuff);
-                show_deck();
+                ShowDeck();
 
                 deckreader.Close();
                 userreader.Close();
@@ -239,11 +267,11 @@ namespace Pamya
             }
 
         }
-        private void show_deck()
+        private void ShowDeck()
         {
-            currentWord = mc.getNextWord(_review_only);
+            currentWord = mc.GetNextWord(_review_only);
             questionBlock.Text = currentWord.question;
-            changeStatusBar();
+            UpdateStatusBar();
         }
         private void _key_press(object sender, KeyEventArgs e)
         {
@@ -277,7 +305,7 @@ namespace Pamya
 
                     //
 
-                    changeStatusBar();
+                    UpdateStatusBar();
 
                     //if (File.Exists(filename))
                      //   System.IO.File.WriteAllText(filename, mc.ToString());
@@ -293,7 +321,7 @@ namespace Pamya
                     TBox.IsEnabled = true;
                     TBox.Foreground = Brushes.Black;
                     TBox.Focus();
-                    show_deck();
+                    ShowDeck();
                 }
             }
         }
@@ -341,23 +369,36 @@ namespace Pamya
                 process.Start();
             }*/
         }
-        public void changeStatusBar()
+        public void UpdateStatusBar()
         {
             //need to cleanup the time usage, I copy paste code which is terrible
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var timeD = epoch.AddSeconds(currentWord.timeDue);
-            lblStatus.Text = "EF: " + currentWord.EF.ToString() + "; n: " + currentWord.n.ToString() + "; Time Due Next: " + timeD.ToLocalTime().ToLongDateString() + " " + timeD.ToLocalTime().ToLongTimeString();
+            //var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            //var timeD = epoch.AddSeconds(currentWord.timeDue);
+            var timeD = EpochTime.AddToEpoch(currentWord.timeDue);
+            lblStatus.Text = "EF: " + currentWord.EF.ToString() + "; n: " + currentWord.n.ToString() + "; Time Due Next: " + timeD.ToLocalTime().ToLongDateString() + " " + timeD.ToLocalTime().ToLongTimeString() + "; RevOnly: " + _review_only.ToString();
         }
 
-        private void _edit_card_window_open(object sender, RoutedEventArgs e)
+        private void _EditCardDialog(object sender, RoutedEventArgs e)
         {
             var edit_window = new EditCardWindow(currentWord);
             edit_window.ShowDialog();
             questionBlock.Text = currentWord.question;
             update_db();
-            changeStatusBar();
+            UpdateStatusBar();
         }
 
+        private void _MarkAsEasy(object sender, RoutedEventArgs e)
+        {
+            currentWord.MarkAsEasy();
+            update_db();
+            UpdateStatusBar();
+        }
+        private void _MarkAsHard(object sender, RoutedEventArgs e)
+        {
+            currentWord.MarkAsHard();
+            update_db();
+            UpdateStatusBar();
+        }
     }
 
 
