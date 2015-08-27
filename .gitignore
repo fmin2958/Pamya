@@ -18,6 +18,8 @@ bld/
 
 InstallerPamya/bin/
 
+*.exe
+
 # Roslyn cache directories
 *.ide/
 
