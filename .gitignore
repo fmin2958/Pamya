@@ -16,6 +16,8 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+InstallerPamya/bin/
+
 # Roslyn cache directories
 *.ide/
 
