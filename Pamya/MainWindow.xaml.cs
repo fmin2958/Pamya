@@ -163,6 +163,7 @@ namespace Pamya
                 stuff = String.Join("\n", deckstuff);
                 //Console.Write(stuff);
                 //for 
+                mc = new Deck();
                 mc.fillDeckFromString(stuff);
                 ShowDeck();
 

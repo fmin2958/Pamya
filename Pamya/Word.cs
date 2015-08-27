@@ -161,8 +161,8 @@ namespace Pamya
 
         public void MarkAsEasy()
         {
-            EF = (EF > 3.5) ? EF : 3.5;
-            n = (n > 10) ? n : 10;
+            EF = (EF > 3.0) ? EF : 3.0;
+            n = (n > 8) ? n : 8;
             I = Ifactor(n);
             SetNextDueDate();
         }

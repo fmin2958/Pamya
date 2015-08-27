@@ -16,6 +16,7 @@ namespace Pamya
             studyList = new List<Word>();
         }
 
+
         public void addWord(Word w)
         {
             dc.Add(w);
