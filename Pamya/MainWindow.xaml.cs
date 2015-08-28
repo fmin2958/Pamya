@@ -145,7 +145,48 @@ namespace Pamya
                 new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
                 userdbcon.Open();
 
-                string stuff = "";
+
+
+
+
+                
+                string sqlcol = "PRAGMA table_info(deck);";
+                SQLiteCommand commandcol = new SQLiteCommand(sqlcol, deckdbcon);
+                SQLiteDataReader colreader = commandcol.ExecuteReader();
+                var idcolexists = false;
+                var examplecolexists = false;
+                
+                while (colreader.Read())
+                {
+                    //MessageBox.Show(colreader["name"].ToString());
+                    if (colreader["name"].ToString().Equals("id"))
+                        idcolexists = true;
+                    if (colreader["name"].ToString().Equals("example"))
+                        examplecolexists = true;
+                }
+
+                if (!idcolexists)
+                {
+                    var sqlcoladd = "ALTER TABLE deck ADD COLUMN id INTEGER;";
+                    SQLiteCommand commandcoladd = new SQLiteCommand(sqlcoladd, deckdbcon);
+                    commandcoladd.ExecuteNonQuery();
+                    commandcoladd = new SQLiteCommand(sqlcoladd, userdbcon);
+                    commandcoladd.ExecuteNonQuery();
+                }
+
+                if (!examplecolexists)
+                {
+                    var sqlcoladd = "ALTER TABLE deck ADD COLUMN example TEXT";
+                    SQLiteCommand commandcoladd = new SQLiteCommand(sqlcoladd, deckdbcon);
+                    commandcoladd.ExecuteNonQuery();
+                }
+
+
+                colreader.Close();
+
+
+
+                //string stuff = "";
 
                 List<string> deckstuff = new List<string>();
 
@@ -154,17 +195,39 @@ namespace Pamya
                 SQLiteDataReader deckreader = command.ExecuteReader();
                 SQLiteCommand usercommand = new SQLiteCommand(sql, userdbcon);
                 SQLiteDataReader userreader = usercommand.ExecuteReader();
+
+                
+                mc = new Deck();
+
+
                 while (deckreader.Read() && userreader.Read())
                 {
-                    deckstuff.Add(deckreader["rowid"].ToString() + "|" + deckreader["question"] + "|" + deckreader["answer"] + "|" +
-                        userreader["ef"] + "|" + userreader["i"] + "|" + userreader["n"] + "|" + userreader["studied"] + "|" + userreader["timedue"] + "|" + deckreader["wavfileloc"]);
+
+                    mc.addWord(new Word( Convert.ToInt32(deckreader["id"]), deckreader["question"].ToString(), deckreader["answer"].ToString(),  Convert.ToDouble(userreader["ef"]),
+                         Convert.ToDouble(userreader["i"]),  Convert.ToInt32(userreader["n"]),  Convert.ToBoolean(userreader["studied"]),
+                         Convert.ToInt32(userreader["timedue"]), deckreader["wavfileloc"].ToString()
+                        ));
+
+                    if (!idcolexists)
+                    {
+                        var sqlcom = "UPDATE deck SET id=" + deckreader["rowid"] + " WHERE rowid=" + deckreader["rowid"] + ";";
+                        command = new SQLiteCommand(sqlcom, deckdbcon);
+                        command.ExecuteNonQuery();
+                        command = new SQLiteCommand(sqlcom, userdbcon);
+                        command.ExecuteNonQuery();
+                    }
+
+                    if (deckreader["guid"].ToString().Length < 10)
+                    {
+                        var sqlguid = "UPDATE deck SET guid='" + Guid.NewGuid().ToString() + "' WHERE rowid=" + deckreader["rowid"] + ";";
+                        command = new SQLiteCommand(sqlguid, deckdbcon);
+                        command.ExecuteNonQuery();
+                        command = new SQLiteCommand(sqlguid, userdbcon);
+                        command.ExecuteNonQuery();
+                    }
+
                 }
 
-                stuff = String.Join("\n", deckstuff);
-                //Console.Write(stuff);
-                //for 
-                mc = new Deck();
-                mc.fillDeckFromString(stuff);
                 ShowDeck();
 
                 deckreader.Close();

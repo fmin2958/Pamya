@@ -58,6 +58,21 @@ namespace Pamya
             id = Convert.ToInt32(idd);
             wavfileloc = wav;
         }
+
+        public Word(int id, string question, string answer, double EF, double I, int n, bool studied, int time_due, string wav_file_location)
+        {
+            this.question = question;
+            this.answer = answer;
+            this.EF = EF;
+            this.I = I;
+            this.n = n;
+            this.studied = studied;
+            this.timeDue = time_due;
+
+            this.id = id;
+            this.wavfileloc = wav_file_location;
+        }
+
         private uint editDistance(string s, string t)
         {
             s = s.ToLower();
