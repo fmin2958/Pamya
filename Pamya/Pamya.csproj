@@ -103,6 +103,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="DeckView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -112,6 +116,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Deck.cs" />
+    <Compile Include="DeckView.xaml.cs">
+      <DependentUpon>DeckView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EditCardWindow.xaml.cs">
       <DependentUpon>EditCardWindow.xaml</DependentUpon>
     </Compile>

@@ -32,9 +32,11 @@ namespace Pamya
     static class CustomCommands
     {
         public static RoutedCommand EditCard = new RoutedCommand();
+        public static RoutedCommand EditDeck = new RoutedCommand();
         public static RoutedCommand MarkAsEasy = new RoutedCommand();
         public static RoutedCommand MarkAsHard = new RoutedCommand();
         public static RoutedCommand ToggleReviewOnly = new RoutedCommand();
+        public static RoutedCommand InsertCardAfter = new RoutedCommand();
     }
 
     static class EpochTime
@@ -119,13 +121,6 @@ namespace Pamya
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = appdatafolder + @"\Links";
-            /*if (openFileDialog.ShowDialog() == true)
-            {
-                string stuff = File.ReadAllText(openFileDialog.FileName);
-                filename = openFileDialog.FileName;
-                mc.fillDeckFromString(stuff);
-                show_deck();
-            }*/
             if (openFileDialog.ShowDialog() == true)
             {
                 var fname = System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
@@ -145,93 +140,38 @@ namespace Pamya
                 new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
                 userdbcon.Open();
 
-
-
-
-
-                
-                string sqlcol = "PRAGMA table_info(deck);";
-                SQLiteCommand commandcol = new SQLiteCommand(sqlcol, deckdbcon);
-                SQLiteDataReader colreader = commandcol.ExecuteReader();
-                var idcolexists = false;
-                var examplecolexists = false;
-                
-                while (colreader.Read())
-                {
-                    //MessageBox.Show(colreader["name"].ToString());
-                    if (colreader["name"].ToString().Equals("id"))
-                        idcolexists = true;
-                    if (colreader["name"].ToString().Equals("example"))
-                        examplecolexists = true;
-                }
-
-                if (!idcolexists)
-                {
-                    var sqlcoladd = "ALTER TABLE deck ADD COLUMN id INTEGER;";
-                    SQLiteCommand commandcoladd = new SQLiteCommand(sqlcoladd, deckdbcon);
-                    commandcoladd.ExecuteNonQuery();
-                    commandcoladd = new SQLiteCommand(sqlcoladd, userdbcon);
-                    commandcoladd.ExecuteNonQuery();
-                }
-
-                if (!examplecolexists)
-                {
-                    var sqlcoladd = "ALTER TABLE deck ADD COLUMN example TEXT";
-                    SQLiteCommand commandcoladd = new SQLiteCommand(sqlcoladd, deckdbcon);
-                    commandcoladd.ExecuteNonQuery();
-                }
-
-
-                colreader.Close();
-
-
-
-                //string stuff = "";
-
                 List<string> deckstuff = new List<string>();
 
-                string sql = "select rowid,* from deck order by rowid asc";
+                string sql = "select * from deck order by id asc";
                 SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
-                SQLiteDataReader deckreader = command.ExecuteReader();
-                SQLiteCommand usercommand = new SQLiteCommand(sql, userdbcon);
-                SQLiteDataReader userreader = usercommand.ExecuteReader();
-
+                SQLiteDataReader deck_reader = command.ExecuteReader();
                 
                 mc = new Deck();
 
-
-                while (deckreader.Read() && userreader.Read())
+                
+                while (deck_reader.Read())
                 {
-
-                    mc.addWord(new Word( Convert.ToInt32(deckreader["id"]), deckreader["question"].ToString(), deckreader["answer"].ToString(),  Convert.ToDouble(userreader["ef"]),
-                         Convert.ToDouble(userreader["i"]),  Convert.ToInt32(userreader["n"]),  Convert.ToBoolean(userreader["studied"]),
-                         Convert.ToInt32(userreader["timedue"]), deckreader["wavfileloc"].ToString()
-                        ));
-
-                    if (!idcolexists)
-                    {
-                        var sqlcom = "UPDATE deck SET id=" + deckreader["rowid"] + " WHERE rowid=" + deckreader["rowid"] + ";";
-                        command = new SQLiteCommand(sqlcom, deckdbcon);
-                        command.ExecuteNonQuery();
-                        command = new SQLiteCommand(sqlcom, userdbcon);
-                        command.ExecuteNonQuery();
-                    }
-
-                    if (deckreader["guid"].ToString().Length < 10)
-                    {
-                        var sqlguid = "UPDATE deck SET guid='" + Guid.NewGuid().ToString() + "' WHERE rowid=" + deckreader["rowid"] + ";";
-                        command = new SQLiteCommand(sqlguid, deckdbcon);
-                        command.ExecuteNonQuery();
-                        command = new SQLiteCommand(sqlguid, userdbcon);
-                        command.ExecuteNonQuery();
-                    }
-
+                    var word = new Word(deck_reader["question"].ToString(),deck_reader["answer"].ToString());
+                    word.id = Convert.ToInt32(deck_reader["id"]);
+                    word.wavfileloc = deck_reader["wavfileloc"].ToString();
+                    word.guid = deck_reader["guid"].ToString();
+                    word.example = deck_reader["example"].ToString();
+                    var user_sql = "SELECT * FROM deck WHERE guid='" + deck_reader["guid"].ToString() + "'";
+                    var user_command = new SQLiteCommand(user_sql, userdbcon);
+                    var user_reader = user_command.ExecuteReader();
+                    user_reader.Read();
+                    word.EF = Convert.ToDouble(user_reader["ef"]);
+                    word.I = Convert.ToDouble(user_reader["i"]);
+                    word.n = Convert.ToInt32(user_reader["n"]);
+                    word.studied = Convert.ToBoolean(user_reader["studied"]);
+                    word.time_due = Convert.ToInt32(user_reader["timedue"]);
+                    user_reader.Close();
+                    mc.AddWord(word);
                 }
 
                 ShowDeck();
 
-                deckreader.Close();
-                userreader.Close();
+                deck_reader.Close();
 
                 userdbcon.Close();
                 deckdbcon.Close();
@@ -239,6 +179,8 @@ namespace Pamya
             
                 
         }
+
+        //DANGEROUS DO NOT USE
         private void _import_dialog(object sender, RoutedEventArgs e)
         {
             //ето просто хуйня 
@@ -282,12 +224,12 @@ namespace Pamya
                 command.ExecuteNonQuery();
 
 
-                int guid = 0;
+                int id = 0;
 
                 foreach (Word w in importDeck.dc)
                 {
 
-                    guid++;
+                    id++;
 
                     System.Diagnostics.Process process = new System.Diagnostics.Process();
                     System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
@@ -309,7 +251,7 @@ namespace Pamya
                     //}
 
 
-                    sql = "insert into deck values('" + guid + "','" + w.question.Replace("'", "''") + "','" + w.answer.Replace("'", "''") + "','" + wavfilename + "');";
+                    sql = "insert into deck values('" + id + "','" + w.question.Replace("'", "''") + "','" + w.answer.Replace("'", "''") + "','" + wavfilename + "');";
                     //MessageBox.Show(sql);
                     command = new SQLiteCommand(sql, deckdbcon);
                     try {
@@ -320,7 +262,7 @@ namespace Pamya
                         MessageBox.Show(sql);
                     }
 
-                    sql = "insert into deck values('" + guid + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.timeDue.ToString() + "');";
+                    sql = "insert into deck values('" + id + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "');";
                     //MessageBox.Show(sql);
                     command = new SQLiteCommand(sql, userdbcon);
                     command.ExecuteNonQuery();
@@ -362,18 +304,18 @@ namespace Pamya
                 userdbcon =
                 new SQLiteConnection("Data Source=" + userfile + ";Version=3;");
                 userdbcon.Open();
-                var sql = "create table deck (guid text,EF text,I text, n text, studied text, timedue text)";
+                var sql = "create table deck (guid text,EF text,I text, n text, studied text, timedue text, id integer)";
                 var command = new SQLiteCommand(sql, userdbcon);
                 command.ExecuteNonQuery();
 
-                sql = "select rowid,* from deck order by rowid asc";
+                sql = "select * from deck order by id asc";
                 command = new SQLiteCommand(sql, deckdbcon);
                 SQLiteDataReader deckreader = command.ExecuteReader();
-                Word w = new Word("Test", "Test");
+                Word w = new Word("Test", "Test"); //Word for default values
                 while (deckreader.Read())
                 {
                     
-                    sql = "insert into deck values('" + deckreader["rowid"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.timeDue.ToString() + "');";
+                    sql = "insert into deck values('" + deckreader["id"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "','"+deckreader["guid"]+"');";
                     //MessageBox.Show(sql);
                     command = new SQLiteCommand(sql, userdbcon);
                     command.ExecuteNonQuery();
@@ -406,6 +348,7 @@ namespace Pamya
                     TBox.IsEnabled = false;
                     string ans = TBox.Text;
                     TBox.Text = currentWord.answer;
+                    exampleBox.Text = currentWord.example;
                     if (currentWord.answered(ans))
                     {
                         TBox.Foreground = Brushes.Green;
@@ -429,12 +372,8 @@ namespace Pamya
 
                     UpdateStatusBar();
 
-                    //if (File.Exists(filename))
-                     //   System.IO.File.WriteAllText(filename, mc.ToString());
-                    //
-
                     //update the database
-                    UpdateUserDB();
+                    UpdateUserDB(currentWord);
 
                 }
                 else
@@ -443,12 +382,13 @@ namespace Pamya
                     TBox.IsEnabled = true;
                     TBox.Foreground = Brushes.Black;
                     TBox.Focus();
+                    exampleBox.Text = "";
                     ShowDeck();
                 }
             }
         }
 
-        public void UpdateUserDB()
+        public void UpdateUserDB(Word w)
         {
             if (File.Exists(iuserfile))
             {
@@ -456,23 +396,30 @@ namespace Pamya
                 userdbcon =
                 new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
                 userdbcon.Open();
-                string sql = "update deck set EF='" + currentWord.EF + "', I='" + currentWord.I + "', n='" + currentWord.n +
-                    "', studied='" + currentWord.studied + "', timedue='" + currentWord.timeDue + "' where rowid=" + currentWord.id + ";";
-                //MessageBox.Show(sql);
-                var command = new SQLiteCommand(sql, userdbcon);
-                try
-                {
-                    command.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
 
+                //first we have to check if the word even exists in the database
+                var check_sql_query = "SELECT count(*) FROM deck WHERE guid='" + w.guid + "';";
+                var check_sql_command = new SQLiteCommand(check_sql_query, userdbcon);
+                int count = Convert.ToInt32(check_sql_command.ExecuteScalar());
+                if (count == 0)
+                {
+                    var insert_sql_query = "INSERT INTO deck (id, EF, I, n, studied, timedue, guid) VALUES "
+                        + "("+w.id+",'" + w.EF +"','" + w.I + "','" + w.n + "','" + w.studied + "','" + w.time_due + "','" + w.guid + "');";
+                } 
+                else
+                {
+                    string sql = "update deck set id=" + w.id + ", EF='" + w.EF + "', I='" + w.I + "', n='" + w.n +
+                    "', studied='" + w.studied + "', timedue='" + w.time_due + "' where guid='" + w.guid + "';";
+
+                    var command = new SQLiteCommand(sql, userdbcon);
+                    try { command.ExecuteNonQuery(); }
+                    catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                }
+                
                 userdbcon.Close();
             }
         }
-        public void UpdateDeckDB()
+        public void UpdateDeckDB(Word w)
         {
             if (File.Exists(iuserfile))
             {
@@ -480,7 +427,11 @@ namespace Pamya
                 userdbcon =
                 new SQLiteConnection("Data Source=" + ideckfile + ";Version=3;");
                 userdbcon.Open();
-                string sql = "update deck set question='" + currentWord.question.Replace("'", "''") + "', answer='" + currentWord.answer.Replace("'", "''") + "' where rowid=" + currentWord.id + ";";
+                string sql = "update deck set question='" + w.question.Replace("'", "''")
+                    + "', answer='" + w.answer.Replace("'", "''")
+                    + "', example='" + w.example.Replace("'", "''")
+                    + "', id=" + w.id
+                    + " where guid='" + w.guid + "';";
                 //MessageBox.Show(sql);
                 var command = new SQLiteCommand(sql, userdbcon);
                 try
@@ -519,7 +470,7 @@ namespace Pamya
             //need to cleanup the time usage, I copy paste code which is terrible
             //var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             //var timeD = epoch.AddSeconds(currentWord.timeDue);
-            var timeD = EpochTime.AddToEpoch(currentWord.timeDue);
+            var timeD = EpochTime.AddToEpoch(currentWord.time_due);
             lblStatus.Text = "EF: " + currentWord.EF.ToString() + "; n: " + currentWord.n.ToString() + "; Time Due Next: " + timeD.ToLocalTime().ToLongDateString() + " " + timeD.ToLocalTime().ToLongTimeString() + "; RevOnly: " + _review_only.ToString();
         }
 
@@ -528,20 +479,33 @@ namespace Pamya
             var edit_window = new EditCardWindow(currentWord);
             edit_window.ShowDialog();
             questionBlock.Text = currentWord.question;
-            UpdateDeckDB();
+            exampleBox.Text = currentWord.example;
+            if (!TBox.IsEnabled)
+                TBox.Text = currentWord.answer;
+            UpdateDeckDB(currentWord);
             UpdateStatusBar();
+        }
+
+        private void _EditDeckDialog(object sender, RoutedEventArgs e)
+        {
+            var edit_deck_window = new DeckView(mc);
+            edit_deck_window.ShowDialog();
+
+            //questionBlock.Text = currentWord.question;
+            //UpdateDeckDB();
+            //UpdateStatusBar();
         }
 
         private void _MarkAsEasy(object sender, RoutedEventArgs e)
         {
             currentWord.MarkAsEasy();
-            UpdateUserDB();
+            UpdateUserDB(currentWord);
             UpdateStatusBar();
         }
         private void _MarkAsHard(object sender, RoutedEventArgs e)
         {
             currentWord.MarkAsHard();
-            UpdateUserDB();
+            UpdateUserDB(currentWord);
             UpdateStatusBar();
         }
     }

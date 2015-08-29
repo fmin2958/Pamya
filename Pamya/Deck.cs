@@ -16,8 +16,17 @@ namespace Pamya
             studyList = new List<Word>();
         }
 
+        public Deck Clone()
+        {
+            var clone_deck = new Deck();
+            foreach (Word w in dc)
+            {
+                clone_deck.AddWord(w.Clone());
+            }
+            return clone_deck;
+        }
 
-        public void addWord(Word w)
+        public void AddWord(Word w)
         {
             dc.Add(w);
         }
@@ -30,15 +39,15 @@ namespace Pamya
                 string[] ws = l.Split('|');
                 if (ws.Length == 2)
                 {
-                    addWord(new Word(ws[0].Trim(), ws[1].Trim()));
+                    AddWord(new Word(ws[0].Trim(), ws[1].Trim()));
                 }
                 else if (ws.Length == 7)
                 {
-                    addWord(new Word(ws[0].Trim(), ws[1].Trim(), ws[2].Trim(), ws[3].Trim(), ws[4].Trim(), ws[5].Trim(), ws[6].Trim()));
+                    AddWord(new Word(ws[0].Trim(), ws[1].Trim(), ws[2].Trim(), ws[3].Trim(), ws[4].Trim(), ws[5].Trim(), ws[6].Trim()));
                 }
                 else if (ws.Length == 9)
                 {
-                    addWord(new Word(ws[0].Trim(), ws[1].Trim(), ws[2].Trim(), ws[3].Trim(), ws[4].Trim(), ws[5].Trim(), ws[6].Trim(), ws[7].Trim(), ws[8].Trim()));
+                    AddWord(new Word(ws[0].Trim(), ws[1].Trim(), ws[2].Trim(), ws[3].Trim(), ws[4].Trim(), ws[5].Trim(), ws[6].Trim(), ws[7].Trim(), ws[8].Trim()));
                 }
                 //
             }
@@ -55,11 +64,11 @@ namespace Pamya
                 var studiedCards = dc.Where(x => x.studied == true).ToList();
 
                 //get all the cards past due and randomise them
-                studyList = studiedCards.Where(x => x.timeDue <= (secondsSinceEpoch)).ToList();
+                studyList = studiedCards.Where(x => x.time_due <= (secondsSinceEpoch)).ToList();
                 studyList.Shuffle();
 
                 //append all cards that will be due in _TIME_TO_LOOK_AHEAD seconds or less randomised
-                var willBeDue = studiedCards.Where(x => (x.timeDue <= (secondsSinceEpoch + _TIME_TO_LOOK_AHEAD)) && (x.timeDue > (secondsSinceEpoch))).ToList();
+                var willBeDue = studiedCards.Where(x => (x.time_due <= (secondsSinceEpoch + _TIME_TO_LOOK_AHEAD)) && (x.time_due > (secondsSinceEpoch))).ToList();
                 willBeDue.Shuffle();
                 studyList.AddRange(willBeDue);
 

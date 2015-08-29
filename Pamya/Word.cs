@@ -10,13 +10,15 @@ namespace Pamya
     {
         public string question;
         public string answer;
+        public string example;
         public double EF;
         public double I;
         public int n;
         public bool studied;
-        public int timeDue;
+        public int time_due;
 
         public int id;
+        public string guid;
         public string wavfileloc;
         public Word(string q, string a)
         {
@@ -26,11 +28,12 @@ namespace Pamya
             I = 1;
             n = 1;
             studied = false;
-            timeDue = 0;
+            time_due = 0;
 
             id = 0;
             wavfileloc = "";
-
+            example = "";
+            guid = Guid.NewGuid().ToString();
         }
         public Word(string q, string a, string e, string i, string nnn, string s, string t)
         {
@@ -40,10 +43,11 @@ namespace Pamya
             I = Convert.ToDouble(i);
             n = Convert.ToInt32(nnn);
             studied = Convert.ToBoolean(s);
-            timeDue = Convert.ToInt32(t);
+            time_due = Convert.ToInt32(t);
 
             id = 0;
             wavfileloc = "";
+            example = "";
         }
         public Word(string idd, string q, string a, string e, string i, string nnn, string s, string t, string wav)
         {
@@ -53,13 +57,14 @@ namespace Pamya
             I = Convert.ToDouble(i);
             n = Convert.ToInt32(nnn);
             studied = Convert.ToBoolean(s);
-            timeDue = Convert.ToInt32(t);
+            time_due = Convert.ToInt32(t);
 
             id = Convert.ToInt32(idd);
             wavfileloc = wav;
+            example = "";
         }
 
-        public Word(int id, string question, string answer, double EF, double I, int n, bool studied, int time_due, string wav_file_location)
+        public Word(int id, string question, string answer, double EF, double I, int n, bool studied, int time_due, string wav_file_location, string example, string guid)
         {
             this.question = question;
             this.answer = answer;
@@ -67,10 +72,17 @@ namespace Pamya
             this.I = I;
             this.n = n;
             this.studied = studied;
-            this.timeDue = time_due;
+            this.time_due = time_due;
 
             this.id = id;
             this.wavfileloc = wav_file_location;
+            this.example = example;
+            this.guid = guid;
+        }
+
+        public Word Clone()
+        {
+            return new Word(id, question, answer, EF, I, n, studied, time_due, wavfileloc, example, guid);
         }
 
         private uint editDistance(string s, string t)
@@ -171,7 +183,7 @@ namespace Pamya
         public void SetNextDueDate()
         {
             int secondsSinceEpoch = EpochTime.GetAsInt();
-            timeDue = secondsSinceEpoch + Convert.ToInt32(I * 60 * 4.5);
+            time_due = secondsSinceEpoch + Convert.ToInt32(I * 60 * 4.5);
         }
 
         public void MarkAsEasy()
@@ -192,7 +204,7 @@ namespace Pamya
 
         public override string ToString()
         {
-            return question + "|" + answer + "|" + EF.ToString() + "|" + I.ToString() + "|" + n.ToString() + "|" + studied.ToString() + "|" + timeDue.ToString();
+            return question + "|" + answer + "|" + EF.ToString() + "|" + I.ToString() + "|" + n.ToString() + "|" + studied.ToString() + "|" + time_due.ToString();
         }
     }
 }

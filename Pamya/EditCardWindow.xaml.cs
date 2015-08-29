@@ -27,12 +27,15 @@ namespace Pamya
 
             QuestionBox.Text = currentword.question;
             AnswerBox.Text = currentword.answer;
+            StudiedBox.IsChecked = currentword.studied;
         }
 
         private void Save_Button_Click(object sender, RoutedEventArgs e)
         {
             currentword.question = QuestionBox.Text;
             currentword.answer = AnswerBox.Text;
+            currentword.example = ExampleBox.Text;
+            currentword.studied = (bool)StudiedBox.IsChecked;
             this.Close();
         }
 

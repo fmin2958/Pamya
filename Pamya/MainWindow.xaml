@@ -7,6 +7,7 @@
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="_OpenDialog"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.EditCard" Executed="_EditCardDialog"></CommandBinding>
+        <CommandBinding Command="local:CustomCommands.EditDeck" Executed="_EditDeckDialog"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.MarkAsEasy" Executed="_MarkAsEasy"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.MarkAsHard" Executed="_MarkAsHard"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.ToggleReviewOnly" Executed="_ToggleReviewOnly"></CommandBinding>
@@ -14,6 +15,7 @@
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Control" Command="Open"></KeyBinding>
         <KeyBinding Key="E" Modifiers="Control" Command="local:CustomCommands.EditCard"></KeyBinding>
+        <KeyBinding Key="D" Modifiers="Control" Command="local:CustomCommands.EditDeck"></KeyBinding>
         <KeyBinding Key="F9" Modifiers="" Command="local:CustomCommands.MarkAsEasy"></KeyBinding>
         <KeyBinding Key="F12" Modifiers="" Command="local:CustomCommands.MarkAsHard"></KeyBinding>
         <KeyBinding Key="R" Modifiers="Control" Command="local:CustomCommands.ToggleReviewOnly"></KeyBinding>
@@ -34,6 +36,7 @@
             </MenuItem>
             <MenuItem Header="_Edit">
                 <MenuItem x:Name="card" Header="_Card"  Command="local:CustomCommands.EditCard" InputGestureText="Ctrl+E"/>
+                <MenuItem x:Name="deck" Header="_Deck"  Command="local:CustomCommands.EditDeck" InputGestureText="Ctrl+D"/>
                 <MenuItem x:Name="markeasy" Header="Mark as _Easy"  Command="local:CustomCommands.MarkAsEasy" InputGestureText="F9"/>
                 <MenuItem x:Name="markhard" Header="Mark as _Hard"  Command="local:CustomCommands.MarkAsHard" InputGestureText="F12"/>
             </MenuItem>
@@ -46,11 +49,14 @@
 
             <TextBlock Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="0,0,0,0" Text = "{Binding LongText}"></TextBlock>
         </StackPanel>
-        <!--<StackPanel FocusManager.FocusedElement="{Binding ElementName=TBox}" DockPanel.Dock="Bottom">
-            <Grid>
-                <TextBox x:Name="TBox" Margin="5" VerticalAlignment="Center" Text="" FontSize="32" AcceptsReturn="False"/>
-            </Grid>
-        </StackPanel>-->
+
+        
+        
+        <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
+
+            <TextBlock Name="exampleBox" FontSize="24" TextWrapping="Wrap" Margin="0,0,0,0" Text = "{Binding LongText}"></TextBlock>
+        </StackPanel>
+
         <TextBox x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>
         <!--<WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
             <Button Name="btnOpenFile" Click="Test">Test</Button>
