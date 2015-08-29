@@ -20,10 +20,12 @@ namespace Pamya
     public partial class DeckView : Window
     {
         public Deck deck;
+        public Deck removed_deck;
         public bool save_changes;
         public DeckView(Deck deck)
         {
             this.deck = deck.Clone();
+            this.removed_deck = new Deck();
             this.save_changes = false;
             InitializeComponent();
             ShowDeck();
@@ -54,6 +56,26 @@ namespace Pamya
                 new_word.id = id + 1;
 
                 deck.dc.Insert(index + 1, new_word);
+            }
+            ShowDeck();
+        }
+        private void _DeleteCard(object sender, RoutedEventArgs e)
+        {
+            if (lvCards.SelectedIndex > -1)
+            {
+                int index = lvCards.SelectedIndex;
+                int id = index + 1;
+                foreach (Word w in deck.dc.Where(x => x.id > id))
+                {
+                    w.id--;
+                }
+                //Word new_word = new Word("New", "Word");
+                //new_word.id = id + 1;
+
+                removed_deck.AddWord(deck.dc[index]);
+                MessageBox.Show(deck.dc[index].ToString());
+
+                deck.dc.RemoveAt(index);
             }
             ShowDeck();
         }

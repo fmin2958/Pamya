@@ -19,7 +19,7 @@ namespace Pamya
 
         public int id;
         public string guid;
-        public string wavfileloc;
+        public string wav_file_loc;
         public Word(string q, string a)
         {
             question = q;
@@ -31,7 +31,7 @@ namespace Pamya
             time_due = 0;
 
             id = 0;
-            wavfileloc = "";
+            wav_file_loc = "";
             example = "";
             guid = Guid.NewGuid().ToString();
         }
@@ -46,7 +46,7 @@ namespace Pamya
             time_due = Convert.ToInt32(t);
 
             id = 0;
-            wavfileloc = "";
+            wav_file_loc = "";
             example = "";
         }
         public Word(string idd, string q, string a, string e, string i, string nnn, string s, string t, string wav)
@@ -60,7 +60,7 @@ namespace Pamya
             time_due = Convert.ToInt32(t);
 
             id = Convert.ToInt32(idd);
-            wavfileloc = wav;
+            wav_file_loc = wav;
             example = "";
         }
 
@@ -75,14 +75,14 @@ namespace Pamya
             this.time_due = time_due;
 
             this.id = id;
-            this.wavfileloc = wav_file_location;
+            this.wav_file_loc = wav_file_location;
             this.example = example;
             this.guid = guid;
         }
 
         public Word Clone()
         {
-            return new Word(id, question, answer, EF, I, n, studied, time_due, wavfileloc, example, guid);
+            return new Word(id, question, answer, EF, I, n, studied, time_due, wav_file_loc, example, guid);
         }
 
         private uint editDistance(string s, string t)
