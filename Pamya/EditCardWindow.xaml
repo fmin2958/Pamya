@@ -12,7 +12,7 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="28"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" x:Name="QuestionText" Margin="5,5,5,5" HorizontalAlignment="Center" Content="Question:" FontSize="24" />
@@ -28,7 +28,15 @@
         <TextBlock Grid.Column="0" Grid.Row="3" x:Name="StudiedText" Margin="5,5,5,5" HorizontalAlignment="Center" Text="Studied:" FontSize="24" />
         <CheckBox Grid.Column="1" Grid.Row="3" x:Name="StudiedBox" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
+        <TextBlock Grid.Column="0" Grid.Row="4" x:Name="WavFileText" Margin="5,5,5,5" HorizontalAlignment="Center" Text="WavFile:" FontSize="24" />
+        <TextBox Grid.Column="1" Grid.Row="4" x:Name="WavFileBox" Margin="5,5,5,5" HorizontalAlignment="Stretch" Text="" FontSize="24" AcceptsReturn="False"/>
+
         <!--<TextBlock Grid.Row="2" FontSize="32" Grid.ColumnSpan="2" TextWrapping="Wrap" Margin="0,0,0,0" Text="WARNING CHANGING THE NEXT ITEMS MAY BE HAZARDOUS"> </TextBlock>-->
+
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="5" 
+                    HorizontalAlignment="Center">
+            <Button Content="Try TTS/Wav" Grid.Column="0" Grid.Row="5" Width="100" Margin="3" Click="Play_TTS_Click" />
+        </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="5" 
                     HorizontalAlignment="Right">

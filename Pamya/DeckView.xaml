@@ -37,6 +37,7 @@
                     <GridViewColumn Header="Answer" Width="200" DisplayMemberBinding="{Binding Answer}" />
                     <GridViewColumn Header="Example" Width="200" DisplayMemberBinding="{Binding Example}" />
                     <GridViewColumn Header="Studied" Width="auto" DisplayMemberBinding="{Binding Studied}" />
+                    <GridViewColumn Header="WavFileLocation" Width="250" DisplayMemberBinding="{Binding Studied}" />
                 </GridView>
             </ListView.View>
         </ListView>

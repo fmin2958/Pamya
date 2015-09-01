@@ -19,29 +19,36 @@ namespace Pamya
     /// </summary>
     public partial class EditCardWindow : Window
     {
-        Word currentword;
-        public EditCardWindow(Word curcard)
+        Word current_word;
+        public EditCardWindow(Word current_word)
         {
-            currentword = curcard;
+            this.current_word = current_word;
             InitializeComponent();
 
-            QuestionBox.Text = currentword.question;
-            AnswerBox.Text = currentword.answer;
-            StudiedBox.IsChecked = currentword.studied;
+            QuestionBox.Text = current_word.question;
+            AnswerBox.Text = current_word.answer;
+            StudiedBox.IsChecked = current_word.studied;
+            WavFileBox.Text = current_word.wav_file_loc;
         }
 
         private void Save_Button_Click(object sender, RoutedEventArgs e)
         {
-            currentword.question = QuestionBox.Text;
-            currentword.answer = AnswerBox.Text;
-            currentword.example = ExampleBox.Text;
-            currentword.studied = (bool)StudiedBox.IsChecked;
+            current_word.question = QuestionBox.Text;
+            current_word.answer = AnswerBox.Text;
+            current_word.example = ExampleBox.Text;
+            current_word.studied = (bool)StudiedBox.IsChecked;
+            current_word.wav_file_loc = WavFileBox.Text;
             this.Close();
         }
 
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Play_TTS_Click(object sender, RoutedEventArgs e)
+        {
+            SpeechPlayer.SpeakWord(current_word);
         }
     }
 }

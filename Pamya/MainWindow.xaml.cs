@@ -19,6 +19,7 @@ using System.Media;
 using System.Net;
 using System.Data.SQLite;
 using System.IO.Compression;
+using System.Xml.Linq;
 
 //THIS CODE IS A MESS
 
@@ -57,15 +58,71 @@ namespace Pamya
         }
     }
 
+    public sealed class PamyaSettings
+    {
+        private static readonly Lazy<PamyaSettings> lazy =
+            new Lazy<PamyaSettings>(() => new PamyaSettings());
+
+        private Dictionary<String, String> settings = new Dictionary<String, String>();
+        public string settings_file;
+    
+        public static PamyaSettings Instance { get { return lazy.Value; } }
+
+        private PamyaSettings()
+        {
+        }
+
+        public void SetSettingsFile(string settings_file)
+        {
+            this.settings_file = settings_file;
+        }
+
+        public string GetSetting(string setting)
+        {
+            if (settings.ContainsKey(setting))
+            {
+                string value = settings[setting];
+                return value;
+            } 
+            else
+            {
+                return "";
+            }
+        }
+
+        public void SaveSettings()
+        {
+            XElement el = new XElement("settings",
+            settings.Select(kv => new XElement(kv.Key, kv.Value)));
+            File.WriteAllText(settings_file, el.ToString());
+        }
+
+        public void GetSettings()
+        {
+            if (File.Exists(settings_file))
+            {
+                string xml = File.ReadAllText(settings_file);
+                XElement rootElement = XElement.Parse(xml);
+                foreach (var el in rootElement.Elements())
+                {
+                    settings.Add(el.Name.LocalName, el.Value);
+                }
+            }
+        }
+    }
+
     public partial class MainWindow : Window
     {
         public Deck current_deck;
         private Word current_word;
         private string filename;
-        private string appdatafolder;
+        private string app_data_folder;
         private string ideckfolder;
         private string ideckfile;
         private string iuserfile;
+
+
+        //private string espeak_binary_location;
 
         private Boolean _review_only;
         public MainWindow()
@@ -78,29 +135,34 @@ namespace Pamya
 
 
 
-            appdatafolder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + @"\Pamya";
+            app_data_folder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + @"\Pamya";
 
             MakeAppDataFolder();
 
             _review_only = false;
+
+            PamyaSettings.Instance.SetSettingsFile(app_data_folder + @"\settings.xml");
+            PamyaSettings.Instance.GetSettings();
+
+           // espeak_binary_location = @"C:\Program Files (x86)\eSpeak\command_line\espeak.exe"; ;
             
         }
 
         private void MakeAppDataFolder()
         {
             //userData = new FileStream(Application.UserAppDataPath + "\\appdata.txt", FileMode.OpenOrCreate);
-            if (!Directory.Exists(appdatafolder))
+            if (!Directory.Exists(app_data_folder))
             {
-                Directory.CreateDirectory(appdatafolder);
+                Directory.CreateDirectory(app_data_folder);
             }
-            if (!Directory.Exists(appdatafolder + @"\Decks"))
+            if (!Directory.Exists(app_data_folder + @"\Decks"))
             {
-                Directory.CreateDirectory(appdatafolder + @"\Decks");
+                Directory.CreateDirectory(app_data_folder + @"\Decks");
             }
 
-            if (!Directory.Exists(appdatafolder + @"\Links"))
+            if (!Directory.Exists(app_data_folder + @"\Links"))
             {
-                Directory.CreateDirectory(appdatafolder + @"\Links");
+                Directory.CreateDirectory(app_data_folder + @"\Links");
             }
         }
 
@@ -121,12 +183,12 @@ namespace Pamya
         private void _OpenDialog(object sender, RoutedEventArgs e)
         {
             OpenFileDialog open_file_dialog = new OpenFileDialog();
-            open_file_dialog.InitialDirectory = appdatafolder + @"\Links";
+            open_file_dialog.InitialDirectory = app_data_folder + @"\Links";
             if (open_file_dialog.ShowDialog() == true)
             {
                 var fname = System.IO.Path.GetFileNameWithoutExtension(open_file_dialog.FileName);
                 this.Title = "Pamya - " + fname;
-                ideckfolder = appdatafolder + @"\Decks\" + fname;
+                ideckfolder = app_data_folder + @"\Decks\" + fname;
                 ideckfile = ideckfolder + @"\deck.sqlite";
                 iuserfile = ideckfolder + @"\userdata.sqlite";
 
@@ -194,7 +256,7 @@ namespace Pamya
                 importDeck.fillDeckFromString(stuff);
                 //show_deck();
 
-                var deckfolder = appdatafolder + @"\Decks\" + System.IO.Path.GetFileNameWithoutExtension(filename);
+                var deckfolder = app_data_folder + @"\Decks\" + System.IO.Path.GetFileNameWithoutExtension(filename);
                 var deckfile = deckfolder + @"\deck.sqlite";
 
                 //var userfolder = appdatafolder + @"\UserData\" + System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
@@ -204,7 +266,7 @@ namespace Pamya
 
                 Directory.CreateDirectory(deckfolder);
 
-                File.Create(appdatafolder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
+                File.Create(app_data_folder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
 
                 SQLiteConnection.CreateFile(deckfile);
                 SQLiteConnection deckdbcon;
@@ -240,14 +302,14 @@ namespace Pamya
                     //if (!File.Exists(wavfile))
                     //{
                     var wavfilename = deckfolder + @"\" + w.answer.Replace("!","_").Replace("-", "_").Replace(" ", "_").Replace(".", "_").Replace(",", "_").Replace("ŝ", "sx").Replace("ĉ", "cx").Replace("ĝ", "gx").Replace("ĵ", "jx").Replace("ĥ", "hx").Replace("ŭ", "ux") + ".wav";
-                    if (!File.Exists(wavfilename))
-                    {
+                    //if (!File.Exists(wavfilename))
+                   // {
 
-                        startInfo.Arguments = "-w \"" + wavfilename + "\" -v eo \"" + w.answer.Replace("!", "").Replace("-", "").Replace(".", "").Replace(",", "").Replace("ŝ", "sx").Replace("ĉ", "cx").Replace("ĝ", "gx").Replace("ĵ", "jx").Replace("ĥ", "hx").Replace("ŭ", "ux") + "\"";
+                   //     startInfo.Arguments = "-w \"" + wavfilename + "\" -v eo \"" + w.answer.Replace("!", "").Replace("-", "").Replace(".", "").Replace(",", "").Replace("ŝ", "sx").Replace("ĉ", "cx").Replace("ĝ", "gx").Replace("ĵ", "jx").Replace("ĥ", "hx").Replace("ŭ", "ux") + "\"";
                         //MessageBox.Show(wavfilename + " ~~~ " + startInfo.Arguments);
-                        process.StartInfo = startInfo;
-                        process.Start();
-                    }
+                   //     process.StartInfo = startInfo;
+                    //    process.Start();
+                   // }
 
                     //}
 
@@ -283,14 +345,14 @@ namespace Pamya
             {
                 filename = openFileDialog.FileName;
 
-                var deckfolder = appdatafolder + @"\Decks\" + System.IO.Path.GetFileNameWithoutExtension(filename);
+                var deckfolder = app_data_folder + @"\Decks\" + System.IO.Path.GetFileNameWithoutExtension(filename);
                 var deckfile = deckfolder + @"\deck.sqlite";
 
                 var userfile = deckfolder + @"\userdata.sqlite";
 
                 Directory.CreateDirectory(deckfolder);
 
-                File.Create(appdatafolder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
+                File.Create(app_data_folder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
 
                 //Extract the zip file
                 ZipFile.ExtractToDirectory(filename, deckfolder);
@@ -361,18 +423,7 @@ namespace Pamya
                         TBox.Foreground = Brushes.Red;
                     }
 
-
-
-                    //ttsEO(currentWord.answer.Replace("ŝ", "sx").Replace("ĉ", "cx").Replace("ĝ", "gx").Replace("ĵ", "jx").Replace("ĥ", "hx").Replace("ŭ", "ux"));
-
-
-                    if (File.Exists(current_word.wav_file_loc))
-                    {
-                        SoundPlayer my_wave_file = new SoundPlayer(current_word.wav_file_loc);
-                        my_wave_file.Play();
-                    }
-
-                    //
+                    SpeechPlayer.SpeakWord(current_word);
 
                     UpdateStatusBar();
 
@@ -468,31 +519,11 @@ namespace Pamya
             }
         }
 
-        public void ttsEO(string w)
-        {
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = @"C:\Program Files (x86)\eSpeak\command_line\espeak.exe"; //FIXME
-            startInfo.Arguments = "-v eo \""+w+"\"";
-            process.StartInfo = startInfo;
-            process.Start();
 
-            /*var wavfile = @"C:\Users\apopov\Desktop\study\esperanto101\" + w + ".wav";
-            if (! File.Exists(wavfile))
-            {
-                startInfo.Arguments = "-w " + wavfile + " -v eo \"" + w + "\"" ;
-                process.StartInfo = startInfo;
-                process.Start();
-            }*/
-        }
         public void UpdateStatusBar()
         {
-            //need to cleanup the time usage, I copy paste code which is terrible
-            //var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            //var timeD = epoch.AddSeconds(currentWord.timeDue);
-            var timeD = EpochTime.AddToEpoch(current_word.time_due);
-            lblStatus.Text = "EF: " + current_word.EF.ToString() + "; n: " + current_word.n.ToString() + "; Time Due Next: " + timeD.ToLocalTime().ToLongDateString() + " " + timeD.ToLocalTime().ToLongTimeString() + "; RevOnly: " + _review_only.ToString();
+            var time_due = EpochTime.AddToEpoch(current_word.time_due);
+            lblStatus.Text = "EF: " + current_word.EF.ToString() + "; n: " + current_word.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToLongDateString() + " " + time_due.ToLocalTime().ToLongTimeString() + "; RevOnly: " + _review_only.ToString();
         }
 
         private void _EditCardDialog(object sender, RoutedEventArgs e)
@@ -514,24 +545,34 @@ namespace Pamya
 
             if (edit_deck_window.save_changes)
             {
+                SQLiteConnection deckdbcon;
+                deckdbcon =
+                new SQLiteConnection("Data Source=" + ideckfile + ";Version=3;");
+                deckdbcon.Open();
+                SQLiteConnection userdbcon;
+                userdbcon =
+                new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
+                userdbcon.Open();
                 //Remove all words to remove
-                foreach (Word w in edit_deck_window.removed_deck.dc)
+                using (var decktrans = deckdbcon.BeginTransaction())
                 {
-                    SQLiteConnection deckdbcon;
-                    deckdbcon =
-                    new SQLiteConnection("Data Source=" + ideckfile + ";Version=3;");
-                    deckdbcon.Open();
-                    SQLiteConnection userdbcon;
-                    userdbcon =
-                    new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
-                    userdbcon.Open();
-
-                    var delete_sql_query = "DELETE FROM deck WHERE guid='" + w.guid + "';";
-                    var delete_sql_command = new SQLiteCommand(delete_sql_query, deckdbcon);
-                    delete_sql_command.ExecuteNonQuery();
-                    delete_sql_command = new SQLiteCommand(delete_sql_query, userdbcon);
-                    delete_sql_command.ExecuteNonQuery();
+                    using (var usertrans = userdbcon.BeginTransaction())
+                    {
+                        foreach (Word w in edit_deck_window.removed_deck.dc)
+                        {
+                            var delete_sql_query = "DELETE FROM deck WHERE guid='" + w.guid + "';";
+                            var delete_sql_command = new SQLiteCommand(delete_sql_query, deckdbcon);
+                            delete_sql_command.ExecuteNonQuery();
+                            delete_sql_command = new SQLiteCommand(delete_sql_query, userdbcon);
+                            delete_sql_command.ExecuteNonQuery();
+                        }
+                        usertrans.Commit();
+                    }
+                    decktrans.Commit();
                 }
+
+                deckdbcon.Close();
+                userdbcon.Close();
 
                 //add and update all other words
                 foreach(Word w in edit_deck_window.deck.dc)

@@ -52,7 +52,7 @@ namespace Pamya
                 {
                     w.id++;
                 }
-                Word new_word = new Word("New", "Word");
+                Word new_word = new Word("Novum", "Verbum");
                 new_word.id = id + 1;
 
                 deck.dc.Insert(index + 1, new_word);
@@ -85,7 +85,7 @@ namespace Pamya
             List<CardView> cards = new List<CardView>();
             foreach (Word w in deck.dc)
             {
-                cards.Add(new CardView() { ID = w.id, Question = w.question, Answer = w.answer, Example = w.example, Studied = w.studied });
+                cards.Add(new CardView() { ID = w.id, Question = w.question, Answer = w.answer, Example = w.example, Studied = w.studied, WavFileLocation = w.wav_file_loc });
             }
             lvCards.ItemsSource = cards;
         }
@@ -114,5 +114,7 @@ namespace Pamya
         public string Example { get; set; }
 
         public bool Studied { get; set; }
+
+        public string WavFileLocation { get; set; }
     }
 }
