@@ -20,6 +20,8 @@ using System.Net;
 using System.Data.SQLite;
 using System.IO.Compression;
 using System.Xml.Linq;
+using System.Reflection;
+using System.Globalization;
 
 //THIS CODE IS A MESS
 
@@ -70,6 +72,9 @@ namespace Pamya
 
         private PamyaSettings()
         {
+            //Load resource settings (defaults)
+            Stream resource = GetType().Assembly.GetManifestResourceStream("Pamya.Resources.settings.xml");
+            GetSettingsFromText((new StreamReader(resource)).ReadToEnd());
         }
 
         public void SetSettingsFile(string settings_file)
@@ -93,7 +98,7 @@ namespace Pamya
         public void SaveSettings()
         {
             XElement el = new XElement("settings",
-            settings.Select(kv => new XElement(kv.Key, kv.Value)));
+                settings.Select(kv => new XElement(kv.Key, kv.Value)));
             File.WriteAllText(settings_file, el.ToString());
         }
 
@@ -102,11 +107,21 @@ namespace Pamya
             if (File.Exists(settings_file))
             {
                 string xml = File.ReadAllText(settings_file);
-                XElement rootElement = XElement.Parse(xml);
-                foreach (var el in rootElement.Elements())
-                {
-                    settings.Add(el.Name.LocalName, el.Value);
-                }
+                GetSettingsFromText(xml);
+            }
+        }
+
+        private void GetSettingsFromText(string xml)
+        {
+            XElement rootElement = XElement.Parse(xml);
+            foreach (var el in rootElement.Elements())
+            {
+                var setting_name = el.Name.LocalName;
+                var setting_value = el.Value;
+                if (settings.ContainsKey(setting_name))
+                    settings[setting_name] = setting_value;
+                else
+                    settings.Add(setting_name, setting_value);
             }
         }
     }
@@ -130,21 +145,51 @@ namespace Pamya
             current_deck = new Deck();
             current_word = new Word("retard", "malfruiĝulo");
 
-            //Console.WriteLine(sky.EditDistance("Saturday", "Sunday"));
-            InitializeComponent();
-
-
-
             app_data_folder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + @"\Pamya";
 
             MakeAppDataFolder();
 
-            _review_only = false;
-
-            PamyaSettings.Instance.SetSettingsFile(app_data_folder + @"\settings.xml");
+            var settings_file_path = app_data_folder + @"\settings.xml";
+            if (!File.Exists(settings_file_path))
+            {
+                Stream resource = GetType().Assembly.GetManifestResourceStream("Pamya.Resources.settings.xml");
+                File.WriteAllText(settings_file_path, (new StreamReader(resource)).ReadToEnd());
+            }
+            PamyaSettings.Instance.SetSettingsFile(settings_file_path);
             PamyaSettings.Instance.GetSettings();
 
-           // espeak_binary_location = @"C:\Program Files (x86)\eSpeak\command_line\espeak.exe"; ;
+
+
+            //var cult = new CultureInfo();
+
+            //CultureInfo.DefaultThreadCurrentCulture = cult;
+            //CultureInfo.DefaultThreadCurrentUICulture = cult;
+
+            ResourceDictionary dict = new ResourceDictionary();
+            var lang = PamyaSettings.Instance.GetSetting("lang");
+            switch(lang)
+            {
+                case "en":
+                    dict.Source = new Uri("/Resources/Localise.xaml", UriKind.Relative);
+                    break;
+                case "ru":
+                    dict.Source = new Uri("/Resources/Localise.ru-RU.xaml", UriKind.Relative);
+                    break;
+                case "eo":
+                    dict.Source = new Uri("/Resources/Localise.eo-EO.xaml", UriKind.Relative);
+                    break;
+                default:
+                    dict.Source = new Uri("/Resources/Localise.xaml", UriKind.Relative);
+                    break;
+            }
+            
+            this.Resources.MergedDictionaries.Add(dict);
+
+
+            //Console.WriteLine(sky.EditDistance("Saturday", "Sunday"));
+            InitializeComponent();
+
+            _review_only = false;
             
         }
 
@@ -363,22 +408,20 @@ namespace Pamya
                 deckdbcon.Open();
 
                 SQLiteConnection.CreateFile(userfile);
-                SQLiteConnection userdbcon;
-                userdbcon =
-                new SQLiteConnection("Data Source=" + userfile + ";Version=3;");
+                SQLiteConnection userdbcon = new SQLiteConnection("Data Source=" + userfile + ";Version=3;");
                 userdbcon.Open();
-                var sql = "create table deck (guid text,EF text,I text, n text, studied text, timedue text, id integer)";
+                var sql = "CREATE TABLE deck (guid text,EF text,I text, n text, studied text, timedue text, id integer)";
                 var command = new SQLiteCommand(sql, userdbcon);
                 command.ExecuteNonQuery();
 
-                sql = "select * from deck order by id asc";
+                sql = "SELECT * FROM deck ORDER BY id ASC";
                 command = new SQLiteCommand(sql, deckdbcon);
                 SQLiteDataReader deckreader = command.ExecuteReader();
                 Word w = new Word("Test", "Test"); //Word for default values
                 while (deckreader.Read())
                 {
                     
-                    sql = "insert into deck values('" + deckreader["id"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "','"+deckreader["guid"]+"');";
+                    sql = "insert into deck values('" + deckreader["guid"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "',"+deckreader["id"]+");";
                     //MessageBox.Show(sql);
                     command = new SQLiteCommand(sql, userdbcon);
                     command.ExecuteNonQuery();
@@ -584,11 +627,6 @@ namespace Pamya
                 UpdateStatusBar();
                 ShowDeck();
             }
-
-
-            //questionBlock.Text = currentWord.question;
-            //UpdateDeckDB();
-            //UpdateStatusBar();
         }
 
         private void _MarkAsEasy(object sender, RoutedEventArgs e)

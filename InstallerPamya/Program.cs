@@ -22,6 +22,11 @@ namespace InstallerPamya
                                     new File(binaries, @"..\Pamya\bin\Release\System.Data.SQLite.dll"),
                                     new File(binaries, @"..\Pamya\bin\Release\SQLite.Interop.dll")
                                 ),
+                                new Dir(@"%ProgramFiles%\Pamya\Resources",
+                                        new File(binaries,@"..\Pamya\Resources\Localise.eo-Eo.xaml"),
+                                        new File(binaries,@"..\Pamya\Resources\Localise.ru-RU.xaml"),
+                                        new File(binaries,@"..\Pamya\Resources\Localise.xaml")
+                                    ),
                                 new Dir("%Startup%",
                                     new ExeFileShortcut(binaries, "Pamya", "[INSTALLDIR]Pamya.exe", "")),
 

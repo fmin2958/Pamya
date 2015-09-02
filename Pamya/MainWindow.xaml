@@ -27,16 +27,16 @@
             </StatusBarItem>
         </StatusBar>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
+            <MenuItem Header="{DynamicResource file}">
                 <MenuItem Header="_Open" Command="Open" />
-                <MenuItem Header="Import from _Text" Click="_import_dialog" IsEnabled="False" />
-                <MenuItem Header="Import from _Zip" Click="_ImportFromZipDialog" IsEnabled="False" />
+                <MenuItem Header="Import from _Text" Click="_import_dialog" IsEnabled="False" ToolTip="This is really buggy for now so I have made the decision to disable it."/>
+                <MenuItem Header="Import from _Zip" Click="_ImportFromZipDialog" IsEnabled="True" />
                 <Separator />
-                <MenuItem Header="_Exit" Click="_app_exit" />
+                <MenuItem Header="{DynamicResource exit}" Click="_app_exit" />
             </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem x:Name="card" Header="_Card"  Command="local:CustomCommands.EditCard" InputGestureText="Ctrl+E"/>
-                <MenuItem x:Name="deck" Header="_Deck"  Command="local:CustomCommands.EditDeck" InputGestureText="Ctrl+D"/>
+            <MenuItem Header="{DynamicResource edit}">
+                <MenuItem x:Name="card" Header="{DynamicResource card}"  Command="local:CustomCommands.EditCard" InputGestureText="Ctrl+E"/>
+                <MenuItem x:Name="deck" Header="{DynamicResource deck}"  Command="local:CustomCommands.EditDeck" InputGestureText="Ctrl+D"/>
                 <MenuItem x:Name="markeasy" Header="Mark as _Easy"  Command="local:CustomCommands.MarkAsEasy" InputGestureText="F9"/>
                 <MenuItem x:Name="markhard" Header="Mark as _Hard"  Command="local:CustomCommands.MarkAsHard" InputGestureText="F12"/>
             </MenuItem>
