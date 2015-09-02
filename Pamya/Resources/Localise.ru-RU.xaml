@@ -3,11 +3,13 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="file">_Файл</system:String>
-    <system:String x:Key="exit">_Выход</system:String>
+        <system:String x:Key="open">_Открыть</system:String>
+        <system:String x:Key="exit">_Выход</system:String>
 
     <system:String x:Key="edit">_Правка</system:String>
+    
     <system:String x:Key="options">_Опции</system:String>
-    <system:String x:Key="card">Ка_рточка</system:String>
-    <system:String x:Key="deck">Ко_лода</system:String>
+        <system:String x:Key="card">Ка_рточка</system:String>
+        <system:String x:Key="deck">Ко_лода</system:String>
 
 </ResourceDictionary>

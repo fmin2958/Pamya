@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Pamya
 {
@@ -20,6 +21,7 @@ namespace Pamya
         public int id;
         public string guid;
         public string wav_file_loc;
+        public string image_file_location;
         public Word(string q, string a)
         {
             question = q;
@@ -34,6 +36,7 @@ namespace Pamya
             wav_file_loc = "";
             example = "";
             guid = Guid.NewGuid().ToString();
+            image_file_location = "";
         }
         public Word(string q, string a, string e, string i, string nnn, string s, string t)
         {
@@ -64,7 +67,7 @@ namespace Pamya
             example = "";
         }
 
-        public Word(int id, string question, string answer, double EF, double I, int n, bool studied, int time_due, string wav_file_location, string example, string guid)
+        public Word(int id, string question, string answer, double EF, double I, int n, bool studied, int time_due, string wav_file_location, string example, string guid, string image_file_location)
         {
             this.question = question;
             this.answer = answer;
@@ -75,14 +78,15 @@ namespace Pamya
             this.time_due = time_due;
 
             this.id = id;
-            this.wav_file_loc = wav_file_location;
+            this.wav_file_loc = Path.GetFileName(wav_file_location);
             this.example = example;
             this.guid = guid;
+            this.image_file_location = image_file_location;
         }
 
         public Word Clone()
         {
-            return new Word(id, question, answer, EF, I, n, studied, time_due, wav_file_loc, example, guid);
+            return new Word(id, question, answer, EF, I, n, studied, time_due, wav_file_loc, example, guid, image_file_location);
         }
 
         private uint editDistance(string s, string t)

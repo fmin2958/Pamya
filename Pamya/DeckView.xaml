@@ -33,11 +33,12 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding ID}" />
-                    <GridViewColumn Header="Question" Width="200" DisplayMemberBinding="{Binding Question}" />
-                    <GridViewColumn Header="Answer" Width="200" DisplayMemberBinding="{Binding Answer}" />
+                    <GridViewColumn Header="Question" Width="150" DisplayMemberBinding="{Binding Question}" />
+                    <GridViewColumn Header="Answer" Width="150" DisplayMemberBinding="{Binding Answer}" />
                     <GridViewColumn Header="Example" Width="200" DisplayMemberBinding="{Binding Example}" />
                     <GridViewColumn Header="Studied" Width="auto" DisplayMemberBinding="{Binding Studied}" />
-                    <GridViewColumn Header="WavFileLocation" Width="250" DisplayMemberBinding="{Binding Studied}" />
+                    <GridViewColumn Header="WavFileLocation" Width="auto" DisplayMemberBinding="{Binding WavFileLocation}" />
+                    <GridViewColumn Header="ImageFileLocation" Width="auto" DisplayMemberBinding="{Binding ImageFileLocation}" />
                 </GridView>
             </ListView.View>
         </ListView>
@@ -46,6 +47,10 @@
             <Button Content="Save" Grid.Column="0" Grid.Row="1" Width="100" Margin="3" Click="Save_Button_Click" />
             <Button Content="Cancel" Grid.Column="0" Grid.Row="1" Width="100" 
                  HorizontalAlignment="Right" Margin="3" Click="Cancel_Button_Click"></Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="5" 
+                    HorizontalAlignment="Left">
+            <Button Content="Try to Generate WAV" Grid.Column="0" Grid.Row="1" Width="200" Margin="3" Click="_TryToGenerateWAV" />
         </StackPanel>
     </Grid>
 </Window>

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Pamya.EditCardWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Card Edit Window" Height="300" Width="600">
+        Title="Card Edit Window" Height="auto" Width="600">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -13,7 +13,9 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="28"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" x:Name="QuestionText" Margin="5,5,5,5" HorizontalAlignment="Center" Content="Question:" FontSize="24" />
         <TextBox Grid.Column="1" Grid.Row="0" x:Name="QuestionBox" Margin="5,5,5,5" HorizontalAlignment="Stretch" Text="" FontSize="24" AcceptsReturn="False"/>
@@ -28,20 +30,28 @@
         <TextBlock Grid.Column="0" Grid.Row="3" x:Name="StudiedText" Margin="5,5,5,5" HorizontalAlignment="Center" Text="Studied:" FontSize="24" />
         <CheckBox Grid.Column="1" Grid.Row="3" x:Name="StudiedBox" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-        <TextBlock Grid.Column="0" Grid.Row="4" x:Name="WavFileText" Margin="5,5,5,5" HorizontalAlignment="Center" Text="WavFile:" FontSize="24" />
+        <TextBlock Grid.Column="0" Grid.Row="4" x:Name="WavFileText" Margin="5,5,5,5" HorizontalAlignment="Center" Text="Wav File:" FontSize="24" />
         <TextBox Grid.Column="1" Grid.Row="4" x:Name="WavFileBox" Margin="5,5,5,5" HorizontalAlignment="Stretch" Text="" FontSize="24" AcceptsReturn="False"/>
+
+        <TextBlock Grid.Column="0" Grid.Row="5" x:Name="ImageFileText" Margin="5,5,5,5" HorizontalAlignment="Center" Text="Image File:" FontSize="24" />
+        <TextBox Grid.Column="1" Grid.Row="5" x:Name="ImageFileBox" Margin="5,5,5,5" HorizontalAlignment="Stretch" Text="" FontSize="24" AcceptsReturn="False"/>
 
         <!--<TextBlock Grid.Row="2" FontSize="32" Grid.ColumnSpan="2" TextWrapping="Wrap" Margin="0,0,0,0" Text="WARNING CHANGING THE NEXT ITEMS MAY BE HAZARDOUS"> </TextBlock>-->
 
-        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="5" 
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="7" 
                     HorizontalAlignment="Center">
-            <Button Content="Try TTS/Wav" Grid.Column="0" Grid.Row="5" Width="100" Margin="3" Click="Play_TTS_Click" />
+            <Button Content="Try TTS/Wav" Grid.Column="0" Grid.Row="7" Width="100" Margin="3" Click="Play_TTS_Click" />
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="5" 
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="7" 
+                    HorizontalAlignment="Left">
+            <CheckBox Content="Reset Word"  Width="100" Margin="3" Name="ResetWordBox" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="7" 
                     HorizontalAlignment="Right">
-            <Button Content="Save" Grid.Column="1" Grid.Row="5" Width="100" Margin="3" Click="Save_Button_Click" />
-            <Button Content="Cancel" Grid.Column="1" Grid.Row="5" Width="100" 
+            <Button Content="Save" Grid.Column="1" Grid.Row="7" Width="100" Margin="3" Click="Save_Button_Click" />
+            <Button Content="Cancel" Grid.Column="1" Grid.Row="7" Width="100" 
                  HorizontalAlignment="Right" Margin="3" Click="Cancel_Button_Click"></Button>
         </StackPanel>
     </Grid>

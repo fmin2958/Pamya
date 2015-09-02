@@ -41,6 +41,7 @@ namespace Pamya
         public static RoutedCommand ToggleReviewOnly = new RoutedCommand();
         public static RoutedCommand InsertCardAfter = new RoutedCommand();
         public static RoutedCommand DeleteCard = new RoutedCommand();
+        public static RoutedCommand ImportFromZipDialog = new RoutedCommand();
     }
 
     static class EpochTime
@@ -60,68 +61,40 @@ namespace Pamya
         }
     }
 
-    public sealed class PamyaSettings
+    public sealed class PamyaDeck
     {
-        private static readonly Lazy<PamyaSettings> lazy =
-            new Lazy<PamyaSettings>(() => new PamyaSettings());
+        private static readonly Lazy<PamyaDeck> lazy =
+            new Lazy<PamyaDeck>(() => new PamyaDeck());
 
-        private Dictionary<String, String> settings = new Dictionary<String, String>();
-        public string settings_file;
-    
-        public static PamyaSettings Instance { get { return lazy.Value; } }
+        public static PamyaDeck Instance { get { return lazy.Value; } }
 
-        private PamyaSettings()
+        private PamyaDeck()
         {
-            //Load resource settings (defaults)
-            Stream resource = GetType().Assembly.GetManifestResourceStream("Pamya.Resources.settings.xml");
-            GetSettingsFromText((new StreamReader(resource)).ReadToEnd());
+
         }
 
-        public void SetSettingsFile(string settings_file)
+        private string current_deck_folder;
+        public string CurrentDeckFolder
         {
-            this.settings_file = settings_file;
-        }
-
-        public string GetSetting(string setting)
-        {
-            if (settings.ContainsKey(setting))
+            get
             {
-                string value = settings[setting];
-                return value;
-            } 
-            else
+                return current_deck_folder;
+            }
+            set
             {
-                return "";
+                current_deck_folder = value;
             }
         }
-
-        public void SaveSettings()
+        private string decks_folder;
+        public string DecksFolder
         {
-            XElement el = new XElement("settings",
-                settings.Select(kv => new XElement(kv.Key, kv.Value)));
-            File.WriteAllText(settings_file, el.ToString());
-        }
-
-        public void GetSettings()
-        {
-            if (File.Exists(settings_file))
+            get
             {
-                string xml = File.ReadAllText(settings_file);
-                GetSettingsFromText(xml);
+                return decks_folder;
             }
-        }
-
-        private void GetSettingsFromText(string xml)
-        {
-            XElement rootElement = XElement.Parse(xml);
-            foreach (var el in rootElement.Elements())
+            set
             {
-                var setting_name = el.Name.LocalName;
-                var setting_value = el.Value;
-                if (settings.ContainsKey(setting_name))
-                    settings[setting_name] = setting_value;
-                else
-                    settings.Add(setting_name, setting_value);
+                decks_folder = value;
             }
         }
     }
@@ -149,6 +122,8 @@ namespace Pamya
 
             MakeAppDataFolder();
 
+            PamyaDeck.Instance.DecksFolder = app_data_folder + @"\Decks";
+
             var settings_file_path = app_data_folder + @"\settings.xml";
             if (!File.Exists(settings_file_path))
             {
@@ -157,13 +132,6 @@ namespace Pamya
             }
             PamyaSettings.Instance.SetSettingsFile(settings_file_path);
             PamyaSettings.Instance.GetSettings();
-
-
-
-            //var cult = new CultureInfo();
-
-            //CultureInfo.DefaultThreadCurrentCulture = cult;
-            //CultureInfo.DefaultThreadCurrentUICulture = cult;
 
             ResourceDictionary dict = new ResourceDictionary();
             var lang = PamyaSettings.Instance.GetSetting("lang");
@@ -185,8 +153,6 @@ namespace Pamya
             
             this.Resources.MergedDictionaries.Add(dict);
 
-
-            //Console.WriteLine(sky.EditDistance("Saturday", "Sunday"));
             InitializeComponent();
 
             _review_only = false;
@@ -220,20 +186,23 @@ namespace Pamya
         }
 
 
-        private void _app_exit(object sender, RoutedEventArgs e)
+        private void _AppExit(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
 
         private void _OpenDialog(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog open_file_dialog = new OpenFileDialog();
-            open_file_dialog.InitialDirectory = app_data_folder + @"\Links";
+            //OpenFileDialog open_file_dialog = new OpenFileDialog();
+            var open_file_dialog = new OpenDeckWindow();
+            //open_file_dialog.InitialDirectory = app_data_folder + @"\Links";
             if (open_file_dialog.ShowDialog() == true)
             {
-                var fname = System.IO.Path.GetFileNameWithoutExtension(open_file_dialog.FileName);
+                //var fname = System.IO.Path.GetFileNameWithoutExtension(open_file_dialog.FileName);
+                var fname = open_file_dialog.FileName;
                 this.Title = "Pamya - " + fname;
                 ideckfolder = app_data_folder + @"\Decks\" + fname;
+                PamyaDeck.Instance.CurrentDeckFolder = ideckfolder;
                 ideckfile = ideckfolder + @"\deck.sqlite";
                 iuserfile = ideckfolder + @"\userdata.sqlite";
 
@@ -248,9 +217,7 @@ namespace Pamya
                 new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
                 userdbcon.Open();
 
-                List<string> deckstuff = new List<string>();
-
-                string sql = "select * from deck order by id asc";
+                string sql = "SELECT * FROM deck ORDER BY id ASC";
                 SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
                 SQLiteDataReader deck_reader = command.ExecuteReader();
                 
@@ -264,6 +231,7 @@ namespace Pamya
                     word.wav_file_loc = deck_reader["wavfileloc"].ToString();
                     word.guid = deck_reader["guid"].ToString();
                     word.example = deck_reader["example"].ToString();
+                    word.image_file_location = deck_reader["imagefileloc"].ToString();
                     var user_sql = "SELECT * FROM deck WHERE guid='" + deck_reader["guid"].ToString() + "'";
                     var user_command = new SQLiteCommand(user_sql, userdbcon);
                     var user_reader = user_command.ExecuteReader();
@@ -289,7 +257,7 @@ namespace Pamya
         }
 
         //DANGEROUS DO NOT USE
-        private void _import_dialog(object sender, RoutedEventArgs e)
+        private void _ImportDialog(object sender, RoutedEventArgs e)
         {
             //ето просто хуйня 
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -318,7 +286,7 @@ namespace Pamya
                 deckdbcon =
                 new SQLiteConnection("Data Source="+deckfile+";Version=3;");
                 deckdbcon.Open();
-                string sql = "create table deck (guid text,question text, answer text, wavfileloc text)";
+                string sql = "create table deck (guid text,question text, answer text, wavfileloc text, id integer, example text, imagefileloc text)";
                 SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
                 command.ExecuteNonQuery();
 
@@ -327,7 +295,7 @@ namespace Pamya
                 userdbcon =
                 new SQLiteConnection("Data Source=" + userfile + ";Version=3;");
                 userdbcon.Open();
-                sql = "create table deck (guid text,EF text,I text, n text, studied text, timedue text)";
+                sql = "create table deck (guid text,EF text,I text, n text, studied text, timedue text, id integer)";
                 command = new SQLiteCommand(sql, userdbcon);
                 command.ExecuteNonQuery();
 
@@ -466,6 +434,13 @@ namespace Pamya
                         TBox.Foreground = Brushes.Red;
                     }
 
+                    var img_file = PamyaDeck.Instance.CurrentDeckFolder + @"\" + current_word.image_file_location;
+                    if (File.Exists(img_file))
+                    {
+                        image.Source = new BitmapImage(new Uri(img_file));
+                        image.Visibility = Visibility.Visible;
+                    }
+
                     SpeechPlayer.SpeakWord(current_word);
 
                     UpdateStatusBar();
@@ -481,12 +456,17 @@ namespace Pamya
                     TBox.Foreground = Brushes.Black;
                     TBox.Focus();
                     exampleBox.Text = "";
+                    image.Visibility = Visibility.Hidden;
                     ShowDeck();
                 }
             }
         }
-
         public void UpdateUserDB(Word w)
+        {
+            UpdateUserDB(new List<Word>() { w });
+        }
+
+        public void UpdateUserDB(List<Word> ws)
         {
             if (File.Exists(iuserfile))
             {
@@ -494,33 +474,43 @@ namespace Pamya
                 userdbcon =
                 new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
                 userdbcon.Open();
-
-                //first we have to check if the word even exists in the database
-                var check_sql_query = "SELECT count(*) FROM deck WHERE guid='" + w.guid + "';";
-                var check_sql_command = new SQLiteCommand(check_sql_query, userdbcon);
-                int count = Convert.ToInt32(check_sql_command.ExecuteScalar());
-                if (count == 0)
+                using (var usertrans = userdbcon.BeginTransaction())
                 {
-                    var insert_sql_query = "INSERT INTO deck (id, EF, I, n, studied, timedue, guid) VALUES "
-                        + "("+w.id+",'" + w.EF +"','" + w.I + "','" + w.n + "','" + w.studied + "','" + w.time_due + "','" + w.guid + "');";
-                    var insert_sql_command = new SQLiteCommand(insert_sql_query, userdbcon);
-                    try { insert_sql_command.ExecuteNonQuery(); }
-                    catch (Exception ex) { MessageBox.Show(ex.ToString()); }
-                } 
-                else
-                {
-                    string sql = "UPDATE deck SET id=" + w.id + ", EF='" + w.EF + "', I='" + w.I + "', n='" + w.n +
-                    "', studied='" + w.studied + "', timedue='" + w.time_due + "' WHERE guid='" + w.guid + "';";
+                    foreach (Word w in ws)
+                    {
+                        //first we have to check if the word even exists in the database
+                        var check_sql_query = "SELECT count(*) FROM deck WHERE guid='" + w.guid + "';";
+                        var check_sql_command = new SQLiteCommand(check_sql_query, userdbcon);
+                        int count = Convert.ToInt32(check_sql_command.ExecuteScalar());
+                        if (count == 0)
+                        {
+                            var insert_sql_query = "INSERT INTO deck (id, EF, I, n, studied, timedue, guid) VALUES "
+                                + "(" + w.id + ",'" + w.EF + "','" + w.I + "','" + w.n + "','" + w.studied + "','" + w.time_due + "','" + w.guid + "');";
+                            var insert_sql_command = new SQLiteCommand(insert_sql_query, userdbcon);
+                            try { insert_sql_command.ExecuteNonQuery(); }
+                            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                        }
+                        else
+                        {
+                            string sql = "UPDATE deck SET id=" + w.id + ", EF='" + w.EF + "', I='" + w.I + "', n='" + w.n +
+                            "', studied='" + w.studied + "', timedue='" + w.time_due + "' WHERE guid='" + w.guid + "';";
 
-                    var command = new SQLiteCommand(sql, userdbcon);
-                    try { command.ExecuteNonQuery(); }
-                    catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                            var command = new SQLiteCommand(sql, userdbcon);
+                            try { command.ExecuteNonQuery(); }
+                            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                        }
+                    }
+                    usertrans.Commit();
                 }
                 
                 userdbcon.Close();
             }
         }
         public void UpdateDeckDB(Word w)
+        {
+            UpdateDeckDB(new List<Word>() { w });
+        }
+        public void UpdateDeckDB(List<Word> ws)
         {
             if (File.Exists(ideckfile))
             {
@@ -529,34 +519,43 @@ namespace Pamya
                 new SQLiteConnection("Data Source=" + ideckfile + ";Version=3;");
                 deckdbcon.Open();
                 //first we have to check if the word even exists in the database
-                var check_sql_query = "SELECT count(*) FROM deck WHERE guid='" + w.guid + "';";
-                var check_sql_command = new SQLiteCommand(check_sql_query, deckdbcon);
-                int count = Convert.ToInt32(check_sql_command.ExecuteScalar());
-                if (count == 0)
+                using (var decktrans = deckdbcon.BeginTransaction())
                 {
-                    var insert_sql_query = "INSERT INTO deck (id, question, answer, example, wavfileloc, guid) VALUES "
-                        + "(" + w.id
-                        + ",'" + w.question.Replace("'", "''")
-                        + "','" + w.answer.Replace("'", "''")
-                        + "','" + w.example.Replace("'", "''")
-                        + "','" + w.wav_file_loc.Replace("'", "''")
-                        + "','" + w.guid + "');";
-                    var insert_sql_command = new SQLiteCommand(insert_sql_query, deckdbcon);
-                    try { insert_sql_command.ExecuteNonQuery(); }
-                    catch (Exception ex) { MessageBox.Show(ex.ToString()); }
-                }
-                else
-                {
-                    string sql = "update deck set question='" + w.question.Replace("'", "''")
-                        + "', answer='" + w.answer.Replace("'", "''")
-                        + "', example='" + w.example.Replace("'", "''")
-                        + "', wavfileloc='" + w.wav_file_loc.Replace("'", "''")
-                        + "', id=" + w.id
-                        + " where guid='" + w.guid + "';";
-                    //MessageBox.Show(sql);
-                    var command = new SQLiteCommand(sql, deckdbcon);
-                    try { command.ExecuteNonQuery(); }
-                    catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                    foreach (Word w in ws)
+                    {
+                        var check_sql_query = "SELECT count(*) FROM deck WHERE guid='" + w.guid + "';";
+                        var check_sql_command = new SQLiteCommand(check_sql_query, deckdbcon);
+                        int count = Convert.ToInt32(check_sql_command.ExecuteScalar());
+                        if (count == 0)
+                        {
+                            var insert_sql_query = "INSERT INTO deck (id, question, answer, example, wavfileloc, guid, imagefileloc) VALUES "
+                                + "(" + w.id
+                                + ",'" + w.question.Replace("'", "''")
+                                + "','" + w.answer.Replace("'", "''")
+                                + "','" + w.example.Replace("'", "''")
+                                + "','" + w.wav_file_loc.Replace("'", "''")
+                                + "','" + w.guid
+                                + "','" + w.image_file_location.Replace("'", "''") + "');";
+                            var insert_sql_command = new SQLiteCommand(insert_sql_query, deckdbcon);
+                            try { insert_sql_command.ExecuteNonQuery(); }
+                            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                        }
+                        else
+                        {
+                            string sql = "UPDATE deck SET question='" + w.question.Replace("'", "''")
+                                + "', answer='" + w.answer.Replace("'", "''")
+                                + "', example='" + w.example.Replace("'", "''")
+                                + "', wavfileloc='" + w.wav_file_loc.Replace("'", "''")
+                                + "', id=" + w.id
+                                + ", imagefileloc='" + w.image_file_location.Replace("'", "''")
+                                + "' WHERE guid='" + w.guid + "';";
+                            //MessageBox.Show(sql);
+                            var command = new SQLiteCommand(sql, deckdbcon);
+                            try { command.ExecuteNonQuery(); }
+                            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                        }
+                    }
+                    decktrans.Commit();
                 }
                 deckdbcon.Close();
             }
@@ -574,9 +573,12 @@ namespace Pamya
             var edit_window = new EditCardWindow(current_word);
             edit_window.ShowDialog();
             questionBlock.Text = current_word.question;
-            exampleBox.Text = current_word.example;
+
             if (!TBox.IsEnabled)
+            {
                 TBox.Text = current_word.answer;
+                exampleBox.Text = current_word.example;
+            }
             UpdateDeckDB(current_word);
             UpdateStatusBar();
         }
@@ -618,11 +620,14 @@ namespace Pamya
                 userdbcon.Close();
 
                 //add and update all other words
-                foreach(Word w in edit_deck_window.deck.dc)
-                {
-                    UpdateDeckDB(w);
-                    UpdateUserDB(w);
-                }
+                //foreach(Word w in edit_deck_window.deck.dc)
+                //{
+                //    UpdateDeckDB(w);
+                //    UpdateUserDB(w);
+                //}
+                UpdateDeckDB(edit_deck_window.deck.dc);
+                UpdateUserDB(edit_deck_window.deck.dc);
+
                 current_deck = edit_deck_window.deck;
                 UpdateStatusBar();
                 ShowDeck();

@@ -3,11 +3,13 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="file">_File</system:String>
-    <system:String x:Key="exit">_Exit</system:String>
+        <system:String x:Key="open">_Open</system:String>
+        <system:String x:Key="exit">_Exit</system:String>
     
     <system:String x:Key="edit">_Edit</system:String>
+    
     <system:String x:Key="options">_Options</system:String>
-    <system:String x:Key="card">_Card</system:String>
-    <system:String x:Key="deck">_Deck</system:String>
+        <system:String x:Key="card">_Card</system:String>
+        <system:String x:Key="deck">_Deck</system:String>
 
 </ResourceDictionary>

@@ -3,11 +3,13 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="file">_Dosiero</system:String>
-    <system:String x:Key="exit">_Eliro</system:String>
+        <system:String x:Key="open">_Malfermu</system:String>
+        <system:String x:Key="exit">_Eliro</system:String>
 
     <system:String x:Key="edit">_Redaktado</system:String>
+    
     <system:String x:Key="options">_Agordoj</system:String>
-    <system:String x:Key="card">Kar_to</system:String>
-    <system:String x:Key="deck">Karta_ro</system:String>
+        <system:String x:Key="card">Kar_to</system:String>
+        <system:String x:Key="deck">Karta_ro</system:String>
 
 </ResourceDictionary>

@@ -29,6 +29,7 @@ namespace Pamya
             this.save_changes = false;
             InitializeComponent();
             ShowDeck();
+
         }
 
         private void _EditCardDialog(object sender, RoutedEventArgs e)
@@ -73,7 +74,6 @@ namespace Pamya
                 //new_word.id = id + 1;
 
                 removed_deck.AddWord(deck.dc[index]);
-                MessageBox.Show(deck.dc[index].ToString());
 
                 deck.dc.RemoveAt(index);
             }
@@ -85,9 +85,18 @@ namespace Pamya
             List<CardView> cards = new List<CardView>();
             foreach (Word w in deck.dc)
             {
-                cards.Add(new CardView() { ID = w.id, Question = w.question, Answer = w.answer, Example = w.example, Studied = w.studied, WavFileLocation = w.wav_file_loc });
+                cards.Add(new CardView() { ID = w.id, Question = w.question, Answer = w.answer, Example = w.example, Studied = w.studied, WavFileLocation = w.wav_file_loc, ImageFileLocation = w.image_file_location });
             }
             lvCards.ItemsSource = cards;
+        }
+
+        private void _TryToGenerateWAV(object sender, RoutedEventArgs e)
+        {
+            foreach (Word w in deck.dc)
+            {
+                SpeechPlayer.EspeakTTS(w, "eo", true);
+            }
+            ShowDeck();
         }
 
         private void Save_Button_Click(object sender, RoutedEventArgs e)
@@ -116,5 +125,8 @@ namespace Pamya
         public bool Studied { get; set; }
 
         public string WavFileLocation { get; set; }
+
+        public string ImageFileLocation { get; set; }
+
     }
 }

@@ -27,8 +27,10 @@ namespace Pamya
 
             QuestionBox.Text = current_word.question;
             AnswerBox.Text = current_word.answer;
+            ExampleBox.Text = current_word.example;
             StudiedBox.IsChecked = current_word.studied;
             WavFileBox.Text = current_word.wav_file_loc;
+            ImageFileBox.Text = current_word.image_file_location;
         }
 
         private void Save_Button_Click(object sender, RoutedEventArgs e)
@@ -38,6 +40,19 @@ namespace Pamya
             current_word.example = ExampleBox.Text;
             current_word.studied = (bool)StudiedBox.IsChecked;
             current_word.wav_file_loc = WavFileBox.Text;
+            current_word.image_file_location = ImageFileBox.Text;
+
+            if ((bool)ResetWordBox.IsChecked)
+            {
+                Word w = new Word("", "");
+                current_word.I = w.I;
+                current_word.EF = w.EF;
+                current_word.n = w.n;
+                current_word.studied = w.studied;
+                current_word.time_due = w.time_due;
+            }
+
+
             this.Close();
         }
 

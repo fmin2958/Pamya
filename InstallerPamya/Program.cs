@@ -10,6 +10,11 @@ namespace InstallerPamya
     {
         static public void Main()
         {
+           /* new Dir(@"%ProgramFiles%\Pamya\Resources",
+                                        new File(binaries,@"..\Pamya\Resources\Localise.eo-Eo.xaml"),
+                                        new File(binaries,@"..\Pamya\Resources\Localise.ru-RU.xaml"),
+                                        new File(binaries,@"..\Pamya\Resources\Localise.xaml")
+                                    )*/
             Feature binaries = new Feature("Pamya Binaries");
             Feature docs = new Feature("Documentation");
             var project = new Project("Pamya",
@@ -20,13 +25,13 @@ namespace InstallerPamya
                                     ),
                                     new File(binaries, @"..\Pamya\PamyaIcon.ico"),
                                     new File(binaries, @"..\Pamya\bin\Release\System.Data.SQLite.dll"),
-                                    new File(binaries, @"..\Pamya\bin\Release\SQLite.Interop.dll")
+                                    new File(binaries, @"..\Pamya\bin\Release\SQLite.Interop.dll"),
+                                    new Dir(@"Resources",
+                                        new File(binaries, @"..\Pamya\Resources\Localise.eo-Eo.xaml"),
+                                        new File(binaries, @"..\Pamya\Resources\Localise.ru-RU.xaml"),
+                                        new File(binaries, @"..\Pamya\Resources\Localise.xaml")
+                                    )
                                 ),
-                                new Dir(@"%ProgramFiles%\Pamya\Resources",
-                                        new File(binaries,@"..\Pamya\Resources\Localise.eo-Eo.xaml"),
-                                        new File(binaries,@"..\Pamya\Resources\Localise.ru-RU.xaml"),
-                                        new File(binaries,@"..\Pamya\Resources\Localise.xaml")
-                                    ),
                                 new Dir("%Startup%",
                                     new ExeFileShortcut(binaries, "Pamya", "[INSTALLDIR]Pamya.exe", "")),
 
