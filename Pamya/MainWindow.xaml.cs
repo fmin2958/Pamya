@@ -42,6 +42,10 @@ namespace Pamya
         public static RoutedCommand InsertCardAfter = new RoutedCommand();
         public static RoutedCommand DeleteCard = new RoutedCommand();
         public static RoutedCommand ImportFromZipDialog = new RoutedCommand();
+
+        //Change game commands
+        public static RoutedCommand ChangeGameTyping = new RoutedCommand();
+        public static RoutedCommand ChangeGameMC = new RoutedCommand();
     }
 
     static class EpochTime
@@ -61,62 +65,31 @@ namespace Pamya
         }
     }
 
-    public sealed class PamyaDeck
-    {
-        private static readonly Lazy<PamyaDeck> lazy =
-            new Lazy<PamyaDeck>(() => new PamyaDeck());
-
-        public static PamyaDeck Instance { get { return lazy.Value; } }
-
-        private PamyaDeck()
-        {
-
-        }
-
-        private string current_deck_folder;
-        public string CurrentDeckFolder
-        {
-            get
-            {
-                return current_deck_folder;
-            }
-            set
-            {
-                current_deck_folder = value;
-            }
-        }
-        private string decks_folder;
-        public string DecksFolder
-        {
-            get
-            {
-                return decks_folder;
-            }
-            set
-            {
-                decks_folder = value;
-            }
-        }
-    }
 
     public partial class MainWindow : Window
     {
-        public Deck current_deck;
-        private Word current_word;
+        public GameInterface current_game;
+        //public Deck current_deck;
+        //private Word current_word;
         private string filename;
         private string app_data_folder;
         private string ideckfolder;
         private string ideckfile;
         private string iuserfile;
+        public delegate void _PostI();
 
 
         //private string espeak_binary_location;
 
-        private Boolean _review_only;
+        //private Boolean _review_only;
         public MainWindow()
         {
-            current_deck = new Deck();
-            current_word = new Word("retard", "malfruiĝulo");
+
+
+
+
+            PamyaDeck.Instance.CurrentDeck = new Deck();
+            PamyaDeck.Instance.CurrentWord = new Word("Word", "Vorto");
 
             app_data_folder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + @"\Pamya";
 
@@ -155,7 +128,13 @@ namespace Pamya
 
             InitializeComponent();
 
-            _review_only = false;
+            PamyaDeck.Instance.bReviewOnly = false;
+
+
+
+            //Set the current game to be the Typing Game
+            current_game = new TypingGame();
+            CurrentGame.Navigate(current_game);
             
         }
 
@@ -170,19 +149,14 @@ namespace Pamya
             {
                 Directory.CreateDirectory(app_data_folder + @"\Decks");
             }
-
-            if (!Directory.Exists(app_data_folder + @"\Links"))
-            {
-                Directory.CreateDirectory(app_data_folder + @"\Links");
-            }
         }
 
         private void _ToggleReviewOnly(object sender, RoutedEventArgs e)
         {
 
-            _review_only = !_review_only;
+            PamyaDeck.Instance.bReviewOnly = !PamyaDeck.Instance.bReviewOnly;
             UpdateStatusBar();
-            ReviewOnlyMenuItem.IsChecked = _review_only;
+            ReviewOnlyMenuItem.IsChecked = PamyaDeck.Instance.bReviewOnly;
         }
 
 
@@ -220,8 +194,8 @@ namespace Pamya
                 string sql = "SELECT * FROM deck ORDER BY id ASC";
                 SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
                 SQLiteDataReader deck_reader = command.ExecuteReader();
-                
-                current_deck = new Deck();
+
+                PamyaDeck.Instance.CurrentDeck = new Deck();
 
                 
                 while (deck_reader.Read())
@@ -234,23 +208,30 @@ namespace Pamya
                     word.image_file_location = deck_reader["imagefileloc"].ToString();
                     var user_sql = "SELECT * FROM deck WHERE guid='" + deck_reader["guid"].ToString() + "'";
                     var user_command = new SQLiteCommand(user_sql, userdbcon);
-                    var user_reader = user_command.ExecuteReader();
-                    user_reader.Read();
-                    word.EF = Convert.ToDouble(user_reader["ef"]);
-                    word.I = Convert.ToDouble(user_reader["i"]);
-                    word.n = Convert.ToInt32(user_reader["n"]);
-                    word.studied = Convert.ToBoolean(user_reader["studied"]);
-                    word.time_due = Convert.ToInt32(user_reader["timedue"]);
-                    user_reader.Close();
-                    current_deck.AddWord(word);
-                }
+                    try
+                    {
+                        var user_reader = user_command.ExecuteReader();
+                        user_reader.Read();
+                        word.EF = Convert.ToDouble(user_reader["ef"]);
+                        word.I = Convert.ToDouble(user_reader["i"]);
+                        word.n = Convert.ToInt32(user_reader["n"]);
+                        word.studied = Convert.ToBoolean(user_reader["studied"]);
+                        word.time_due = Convert.ToInt32(user_reader["timedue"]);
+                        user_reader.Close();
+                        PamyaDeck.Instance.CurrentDeck.AddWord(word);
+                    } catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
 
+                }
                 ShowDeck();
 
                 deck_reader.Close();
 
                 userdbcon.Close();
                 deckdbcon.Close();
+
             }
             
                 
@@ -266,20 +247,14 @@ namespace Pamya
                 string stuff = File.ReadAllText(openFileDialog.FileName);
                 filename = openFileDialog.FileName;
                 var importDeck = new Deck();
-                importDeck.fillDeckFromString(stuff);
-                //show_deck();
+                importDeck.fillDeckFromString(stuff); // change this
 
                 var deckfolder = app_data_folder + @"\Decks\" + System.IO.Path.GetFileNameWithoutExtension(filename);
                 var deckfile = deckfolder + @"\deck.sqlite";
 
-                //var userfolder = appdatafolder + @"\UserData\" + System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                //var userfile = userfolder + @".sqlite";
                 var userfile = deckfolder + @"\userdata.sqlite";
-                //MessageBox.Show(deckfile);
 
                 Directory.CreateDirectory(deckfolder);
-
-                File.Create(app_data_folder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
 
                 SQLiteConnection.CreateFile(deckfile);
                 SQLiteConnection deckdbcon;
@@ -299,54 +274,11 @@ namespace Pamya
                 command = new SQLiteCommand(sql, userdbcon);
                 command.ExecuteNonQuery();
 
-
-                int id = 0;
-
-                foreach (Word w in importDeck.dc)
-                {
-
-                    id++;
-
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
-                    System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                    startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                    startInfo.FileName = @"C:\Program Files (x86)\eSpeak\command_line\espeak.exe";
-
-                    //if (!File.Exists(wavfile))
-                    //{
-                    var wavfilename = deckfolder + @"\" + w.answer.Replace("!","_").Replace("-", "_").Replace(" ", "_").Replace(".", "_").Replace(",", "_").Replace("ŝ", "sx").Replace("ĉ", "cx").Replace("ĝ", "gx").Replace("ĵ", "jx").Replace("ĥ", "hx").Replace("ŭ", "ux") + ".wav";
-                    //if (!File.Exists(wavfilename))
-                   // {
-
-                   //     startInfo.Arguments = "-w \"" + wavfilename + "\" -v eo \"" + w.answer.Replace("!", "").Replace("-", "").Replace(".", "").Replace(",", "").Replace("ŝ", "sx").Replace("ĉ", "cx").Replace("ĝ", "gx").Replace("ĵ", "jx").Replace("ĥ", "hx").Replace("ŭ", "ux") + "\"";
-                        //MessageBox.Show(wavfilename + " ~~~ " + startInfo.Arguments);
-                   //     process.StartInfo = startInfo;
-                    //    process.Start();
-                   // }
-
-                    //}
-
-
-                    sql = "insert into deck values('" + id + "','" + w.question.Replace("'", "''") + "','" + w.answer.Replace("'", "''") + "','" + wavfilename + "');";
-                    //MessageBox.Show(sql);
-                    command = new SQLiteCommand(sql, deckdbcon);
-                    try {
-                        command.ExecuteNonQuery();
-                         } catch
-                    {
-                        //MessageBox.Show(ex.ToString());
-                        MessageBox.Show(sql);
-                    }
-
-                    sql = "insert into deck values('" + id + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "');";
-                    //MessageBox.Show(sql);
-                    command = new SQLiteCommand(sql, userdbcon);
-                    command.ExecuteNonQuery();
-                }
-
-
                 userdbcon.Close();
                 deckdbcon.Close();
+
+                UpdateDeckDB(importDeck.dc);
+                UpdateUserDB(importDeck.dc);
             }
 
         }
@@ -364,8 +296,6 @@ namespace Pamya
                 var userfile = deckfolder + @"\userdata.sqlite";
 
                 Directory.CreateDirectory(deckfolder);
-
-                File.Create(app_data_folder + @"\Links\" + System.IO.Path.GetFileNameWithoutExtension(filename) + ".deck");
 
                 //Extract the zip file
                 ZipFile.ExtractToDirectory(filename, deckfolder);
@@ -386,13 +316,17 @@ namespace Pamya
                 command = new SQLiteCommand(sql, deckdbcon);
                 SQLiteDataReader deckreader = command.ExecuteReader();
                 Word w = new Word("Test", "Test"); //Word for default values
-                while (deckreader.Read())
+                using (var usertrans = userdbcon.BeginTransaction())
                 {
-                    
-                    sql = "insert into deck values('" + deckreader["guid"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "',"+deckreader["id"]+");";
-                    //MessageBox.Show(sql);
-                    command = new SQLiteCommand(sql, userdbcon);
-                    command.ExecuteNonQuery();
+                    while (deckreader.Read())
+                    {
+
+                        sql = "insert into deck values('" + deckreader["guid"] + "','" + w.EF.ToString() + "','" + w.I.ToString() + "','" + w.n.ToString() + "','" + w.studied.ToString() + "','" + w.time_due.ToString() + "'," + deckreader["id"] + ");";
+                        //MessageBox.Show(sql);
+                        command = new SQLiteCommand(sql, userdbcon);
+                        command.ExecuteNonQuery();
+                    }
+                    usertrans.Commit();
                 }
                 deckreader.Close();
 
@@ -400,6 +334,8 @@ namespace Pamya
 
                 deckdbcon.Close();
                 userdbcon.Close();
+
+
             }
 
         }
@@ -407,60 +343,33 @@ namespace Pamya
 
         private void ShowDeck()
         {
-            current_word = current_deck.GetNextWord(_review_only);
-            questionBlock.Text = current_word.question;
+            
+
+            //Done in the game
+            //questionBlock.Text = current_word.question;
+            current_game.ShowDeck();
+
+            //done here
             UpdateStatusBar();
         }
 
 
         //I have to fix this next, maybe with some states or somethiong, b/c this is also a mess at the moment
-        private void _key_press(object sender, KeyEventArgs e)
+        private void _KeyPress(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                //do something if 'enter' key is pressed.
-                //MessageBox.Show("Boom");
-                if (TBox.IsEnabled == true)
-                {
-                    TBox.IsEnabled = false;
-                    string ans = TBox.Text;
-                    TBox.Text = current_word.answer;
-                    exampleBox.Text = current_word.example;
-                    if (current_word.answered(ans))
-                    {
-                        TBox.Foreground = Brushes.Green;
-                    } else
-                    {
-                        TBox.Foreground = Brushes.Red;
-                    }
 
-                    var img_file = PamyaDeck.Instance.CurrentDeckFolder + @"\" + current_word.image_file_location;
-                    if (File.Exists(img_file))
-                    {
-                        image.Source = new BitmapImage(new Uri(img_file));
-                        image.Visibility = Visibility.Visible;
-                    }
-
-                    SpeechPlayer.SpeakWord(current_word);
-
-                    UpdateStatusBar();
-
-                    //update the database
-                    UpdateUserDB(current_word);
-
-                }
-                else
-                {
-                    TBox.Text = "";
-                    TBox.IsEnabled = true;
-                    TBox.Foreground = Brushes.Black;
-                    TBox.Focus();
-                    exampleBox.Text = "";
-                    image.Visibility = Visibility.Hidden;
-                    ShowDeck();
-                }
-            }
+            current_game._KeyPress(sender, e);
+            _PostInteraction();
         }
+
+        public void _PostInteraction()
+        {
+            UpdateStatusBar();
+
+            //update the database
+            UpdateUserDB(PamyaDeck.Instance.CurrentWord);
+        }
+
         public void UpdateUserDB(Word w)
         {
             UpdateUserDB(new List<Word>() { w });
@@ -564,28 +473,24 @@ namespace Pamya
 
         public void UpdateStatusBar()
         {
-            var time_due = EpochTime.AddToEpoch(current_word.time_due);
-            lblStatus.Text = "EF: " + current_word.EF.ToString() + "; n: " + current_word.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToLongDateString() + " " + time_due.ToLocalTime().ToLongTimeString() + "; RevOnly: " + _review_only.ToString();
+            var time_due = EpochTime.AddToEpoch(PamyaDeck.Instance.CurrentWord.time_due);
+            lblStatus.Text = "EF: " + PamyaDeck.Instance.CurrentWord.EF.ToString() + "; n: " + PamyaDeck.Instance.CurrentWord.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToLongDateString() + " " + time_due.ToLocalTime().ToLongTimeString() + "; RevOnly: " + PamyaDeck.Instance.bReviewOnly.ToString();
         }
 
         private void _EditCardDialog(object sender, RoutedEventArgs e)
         {
-            var edit_window = new EditCardWindow(current_word);
+            var edit_window = new EditCardWindow(PamyaDeck.Instance.CurrentWord);
             edit_window.ShowDialog();
-            questionBlock.Text = current_word.question;
 
-            if (!TBox.IsEnabled)
-            {
-                TBox.Text = current_word.answer;
-                exampleBox.Text = current_word.example;
-            }
-            UpdateDeckDB(current_word);
+            current_game._EditCard();
+
+            UpdateDeckDB(PamyaDeck.Instance.CurrentWord);
             UpdateStatusBar();
         }
 
         private void _EditDeckDialog(object sender, RoutedEventArgs e)
         {
-            var edit_deck_window = new DeckView(current_deck);
+            var edit_deck_window = new DeckView(PamyaDeck.Instance.CurrentDeck);
             edit_deck_window.ShowDialog();
 
             if (edit_deck_window.save_changes)
@@ -628,7 +533,7 @@ namespace Pamya
                 UpdateDeckDB(edit_deck_window.deck.dc);
                 UpdateUserDB(edit_deck_window.deck.dc);
 
-                current_deck = edit_deck_window.deck;
+                PamyaDeck.Instance.CurrentDeck = edit_deck_window.deck;
                 UpdateStatusBar();
                 ShowDeck();
             }
@@ -636,22 +541,38 @@ namespace Pamya
 
         private void _MarkAsEasy(object sender, RoutedEventArgs e)
         {
-            current_word.MarkAsEasy();
-            UpdateUserDB(current_word);
+            PamyaDeck.Instance.CurrentWord.MarkAsEasy();
+            UpdateUserDB(PamyaDeck.Instance.CurrentWord);
             UpdateStatusBar();
         }
         private void _MarkAsHard(object sender, RoutedEventArgs e)
         {
-            current_word.MarkAsHard();
-            UpdateUserDB(current_word);
+            PamyaDeck.Instance.CurrentWord.MarkAsHard();
+            UpdateUserDB(PamyaDeck.Instance.CurrentWord);
             UpdateStatusBar();
         }
+
+        private void _ChangeGameTyping(object sender, RoutedEventArgs e)
+        {
+            current_game = new TypingGame();
+            CurrentGame.Navigate(current_game);
+            current_game.ShowDeck();
+            //CurrentGame.Source = new Uri("TypingGame.xaml", UriKind.Relative);
+        }
+
+        private void _ChangeGameMC(object sender, RoutedEventArgs e)
+        {
+            current_game = new MCGame(new _PostI(_PostInteraction));
+            CurrentGame.Navigate(current_game);
+            current_game.ShowDeck();
+        }
+
     }
 
 
     static class MyExtensions
     {
-        public static void Shuffle<T>(this IList<T> list)
+        /*public static void Shuffle<T>(this IList<T> list)
         {
             RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
             int n = list.Count;
@@ -666,6 +587,19 @@ namespace Pamya
                 list[k] = list[n];
                 list[n] = value;
             }
+        }*/
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            Random rnd = new Random();
+            for (var i = 0; i < list.Count; i++)
+                list.Swap(i, rnd.Next(i, list.Count));
+        }
+
+        public static void Swap<T>(this IList<T> list, int i, int j)
+        {
+            var temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
         }
     }
 

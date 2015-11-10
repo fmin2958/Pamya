@@ -34,43 +34,43 @@ namespace Pamya
         public void fillDeckFromString(string s)
         {
             dc = new List<Word>();
+            int id = 0;
             foreach (string l in s.Split('\n'))
             {
                 string[] ws = l.Split('|');
-                if (ws.Length == 2)
-                {
-                    AddWord(new Word(ws[0].Trim(), ws[1].Trim()));
-                }
-                else if (ws.Length == 7)
-                {
-                    AddWord(new Word(ws[0].Trim(), ws[1].Trim(), ws[2].Trim(), ws[3].Trim(), ws[4].Trim(), ws[5].Trim(), ws[6].Trim()));
-                }
-                else if (ws.Length == 9)
-                {
-                    AddWord(new Word(ws[0].Trim(), ws[1].Trim(), ws[2].Trim(), ws[3].Trim(), ws[4].Trim(), ws[5].Trim(), ws[6].Trim(), ws[7].Trim(), ws[8].Trim()));
-                }
-                //
+                id++;
+                string guid = new Guid().ToString();
+                Word word = new Word(ws[0].Trim(), ws[1].Trim());
+                word.id = id;
+                word.guid = guid;
+                dc.Add(word);
             }
         }
 
         public Word GetNextWord(Boolean _review_only)
         {
-            const int _TIME_TO_LOOK_AHEAD = 3300; //55 minutes
+            //FIXME make this rely on config file
+            const int _TIME_TO_LOOK_AHEAD = 3300; //55 minutes FIXME: make modifiable
             if (studyList.Count == 0)
             {
+
                 int secondsSinceEpoch = EpochTime.GetAsInt();
 
                 //get all cards already studied
                 var studiedCards = dc.Where(x => x.studied == true).ToList();
 
-                //get all the cards past due and randomise them
+                //get all the cards past due and randomise them 
                 studyList = studiedCards.Where(x => x.time_due <= (secondsSinceEpoch)).ToList();
+
                 studyList.Shuffle();
+
 
                 //append all cards that will be due in _TIME_TO_LOOK_AHEAD seconds or less randomised
                 var willBeDue = studiedCards.Where(x => (x.time_due <= (secondsSinceEpoch + _TIME_TO_LOOK_AHEAD)) && (x.time_due > (secondsSinceEpoch))).ToList();
                 willBeDue.Shuffle();
                 studyList.AddRange(willBeDue);
+
+
 
 
                 //Add new cards too at the start only if _review_only is false
@@ -83,6 +83,8 @@ namespace Pamya
                     studyList.Reverse();
                 }
 
+
+
             }
 
             if (!(studyList.Count > 0))
@@ -92,6 +94,44 @@ namespace Pamya
             return nextCard;
 
 
+        }
+
+
+        public Queue<Word> RandomWords(int amount, Word exclude)
+        {
+            Queue<Word> ws = new Queue<Word>();
+            dc.Shuffle();
+            int offset = 0;
+            bool bExclude = dc.Count > 1;
+            if (dc.Count == 0)
+            {
+                for (int i = 0; i < amount + 1; i++)
+                {
+                    ws.Enqueue(new Word("TOO","TOO SHORT"));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < amount + 1; )
+                {
+                    if (i + offset == dc.Count)
+                    {
+                        i = 0;
+                        offset = 0;
+                    }
+                    if (bExclude && dc[i + offset].question == exclude.question)
+                    {
+                        offset++;
+                    }
+                    else
+                    {
+                        ws.Enqueue(dc[i + offset]);
+
+                        i++;
+                    }
+                }
+            }
+            return ws;
         }
 
 

@@ -11,10 +11,22 @@
             <RowDefinition Height="28"></RowDefinition>
         </Grid.RowDefinitions>
         <ListBox x:Name="ListBox" Grid.Column="0" Grid.Row="0" Margin="5,5,5,5">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel HorizontalAlignment="Center" >
+                        <TextBlock  FontSize="24" Text="{Binding Name}"></TextBlock>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                    <EventSetter Event="MouseDoubleClick" Handler="_OpenButtonClick"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
         <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="1" 
                     HorizontalAlignment="Right">
-            <Button Content="Open" Grid.Column="0" Grid.Row="1" Width="100" Margin="3" Click="_OpenButtonClick" />
+            <Button Content="{DynamicResource open}" Grid.Column="0" Grid.Row="1" Width="100" Margin="3" Click="_OpenButtonClick" />
             <Button Content="Cancel" Grid.Column="0" Grid.Row="1" Width="100" 
                  HorizontalAlignment="Right" Margin="3" Click="_CancelButtonClick"></Button>
         </StackPanel>

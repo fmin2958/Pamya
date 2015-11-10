@@ -22,6 +22,7 @@ namespace Pamya
     public partial class OpenDeckWindow : Window
     {
         private string file_name;
+        private List<DeckDisplay> dd;
         public string FileName
         {
             get
@@ -36,30 +37,34 @@ namespace Pamya
         public OpenDeckWindow()
         {
             InitializeComponent();
-            //List<DeckDisplay> notes = new List<DeckDisplay>();
-            List<string> notes = new List<string>();
+            dd = new List<DeckDisplay>();
+            //List<string> notes = new List<string>();
 
             //MessageBox.Show(PamyaDeck.Instance.DecksFolder);
 
             foreach (var d in Directory.GetDirectories(PamyaDeck.Instance.DecksFolder))
             {
                 //MessageBox.Show(d.ToString());
-                //notes.Add(new DeckDisplay { Name = System.IO.Path.GetDirectoryName(d.ToString()) });
-                notes.Add(System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(d.ToString() + @"\")));
+                dd.Add(new DeckDisplay { Name = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(d.ToString() + @"\")) });
+                //notes.Add(System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(d.ToString() + @"\")));
             }
             //notes.Add(new DeckDisplay { Item = "a", Value = 1 });
 
-            ListBox.ItemsSource = notes;
+            ListBox.ItemsSource = dd;
             //ListBox.DisplayMember = "Item";
         }
 
         private void _OpenButtonClick(object sender, RoutedEventArgs e)
         {
-            FileName = ListBox.SelectedItem as string;
-            if (Directory.Exists(PamyaDeck.Instance.DecksFolder + @"\" + FileName))
+            //FileName = ListBox.SelectedItem as DeckDisplay;
+            if (ListBox.SelectedIndex > -1)
             {
-                this.DialogResult = true;
-                this.Close();
+                FileName = dd[ListBox.SelectedIndex].Name;
+                if (Directory.Exists(PamyaDeck.Instance.DecksFolder + @"\" + FileName))
+                {
+                    this.DialogResult = true;
+                    this.Close();
+                }
             }
         }
         private void _CancelButtonClick(object sender, RoutedEventArgs e)

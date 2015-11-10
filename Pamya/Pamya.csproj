@@ -108,6 +108,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MCGame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TypingGame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -122,6 +130,14 @@
     </Compile>
     <Compile Include="EditCardWindow.xaml.cs">
       <DependentUpon>EditCardWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GameInterface.cs" />
+    <Compile Include="MCGame.xaml.cs">
+      <DependentUpon>MCGame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PamyaDeck.cs" />
+    <Compile Include="TypingGame.xaml.cs">
+      <DependentUpon>TypingGame.xaml</DependentUpon>
     </Compile>
     <Compile Include="OpenDeckWindow.xaml.cs">
       <DependentUpon>OpenDeckWindow.xaml</DependentUpon>

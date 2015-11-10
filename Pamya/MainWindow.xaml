@@ -1,9 +1,12 @@
 ﻿<Window x:Class="Pamya.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Pamya" Height="600" Width="800" KeyUp="_key_press"
+        Title="Pamya" Height="600" Width="800" KeyUp="_KeyPress"
         Icon="./Resources/PamyaIcon.png"
-        xmlns:local="clr-namespace:Pamya">
+        xmlns:local="clr-namespace:Pamya"
+        ResizeMode="CanResizeWithGrip"
+        MinHeight="300"
+        MinWidth="400">
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="_OpenDialog"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.EditCard" Executed="_EditCardDialog"></CommandBinding>
@@ -12,6 +15,8 @@
         <CommandBinding Command="local:CustomCommands.MarkAsEasy" Executed="_MarkAsEasy"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.MarkAsHard" Executed="_MarkAsHard"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.ToggleReviewOnly" Executed="_ToggleReviewOnly"></CommandBinding>
+        <CommandBinding Command="local:CustomCommands.ChangeGameTyping" Executed="_ChangeGameTyping"></CommandBinding>
+        <CommandBinding Command="local:CustomCommands.ChangeGameMC" Executed="_ChangeGameMC"></CommandBinding>
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Control" Command="Open"></KeyBinding>
@@ -21,48 +26,7 @@
         <KeyBinding Key="F12" Modifiers="" Command="local:CustomCommands.MarkAsHard"></KeyBinding>
         <KeyBinding Key="R" Modifiers="Control" Command="local:CustomCommands.ToggleReviewOnly"></KeyBinding>
     </Window.InputBindings>
-    <!--<DockPanel>
-        <StatusBar DockPanel.Dock="Bottom" Height="24">
-            <StatusBarItem Height="24">
-                <TextBlock Name="lblStatus" Text=""/>
-            </StatusBarItem>
-        </StatusBar>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="{DynamicResource file}">
-                <MenuItem Header="{DynamicResource open}" Command="Open" />
-                <MenuItem Header="Import from _Text" Click="_ImportDialog" IsEnabled="False" ToolTip="This is really buggy for now so I have made the decision to disable it."/>
-                <MenuItem Header="Import from _Zip" Command="local:CustomCommands.ImportFromZipDialog" IsEnabled="True" />
-                <Separator />
-                <MenuItem Header="{DynamicResource exit}" Click="_AppExit" />
-            </MenuItem>
-            <MenuItem Header="{DynamicResource edit}">
-                <MenuItem x:Name="card" Header="{DynamicResource card}"  Command="local:CustomCommands.EditCard" InputGestureText="Ctrl+E"/>
-                <MenuItem x:Name="deck" Header="{DynamicResource deck}"  Command="local:CustomCommands.EditDeck" InputGestureText="Ctrl+D"/>
-                <MenuItem x:Name="markeasy" Header="Mark as _Easy"  Command="local:CustomCommands.MarkAsEasy" InputGestureText="F9"/>
-                <MenuItem x:Name="markhard" Header="Mark as _Hard"  Command="local:CustomCommands.MarkAsHard" InputGestureText="F12"/>
-            </MenuItem>
-            <MenuItem Header="{DynamicResource options}">
-                <MenuItem x:Name="ReviewOnlyMenuItem" Header="_Review Only"  IsCheckable="True" Command="local:CustomCommands.ToggleReviewOnly" InputGestureText="Ctrl+R"/>
-            </MenuItem>
-        </Menu>
-
-        <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
-
-            <TextBlock Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="0,0,0,0" Text = "{Binding LongText}"></TextBlock>
-        </StackPanel>
-
-        
-        
-        <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
-
-            <TextBlock Name="exampleBox" FontSize="24" TextWrapping="Wrap" Margin="0,0,0,0" Text = "{Binding LongText}"></TextBlock>
-        </StackPanel>
-
-        <Image VerticalAlignment="Center" Height="auto" Width="auto" Name="image" Source="Resources/PamyaIcon.png"/>
-
-        <TextBox x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>
-
-    </DockPanel>-->
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -89,15 +53,22 @@
                 <MenuItem x:Name="markeasy" Header="Mark as _Easy"  Command="local:CustomCommands.MarkAsEasy" InputGestureText="F9"/>
                 <MenuItem x:Name="markhard" Header="Mark as _Hard"  Command="local:CustomCommands.MarkAsHard" InputGestureText="F12"/>
             </MenuItem>
+            <MenuItem Header="Game">
+                <MenuItem x:Name="type" Header="Typing"  Command="local:CustomCommands.ChangeGameTyping"/>
+                <MenuItem x:Name="multiplechoice" Header="Multiple Choice"  Command="local:CustomCommands.ChangeGameMC"/>
+            </MenuItem>
             <MenuItem Header="{DynamicResource options}">
                 <MenuItem x:Name="ReviewOnlyMenuItem" Header="_Review Only"  IsCheckable="True" Command="local:CustomCommands.ToggleReviewOnly" InputGestureText="Ctrl+R"/>
             </MenuItem>
         </Menu>
-        <TextBlock Grid.Row="1" Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
+        <!--<TextBlock Grid.Row="1" Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
         <TextBlock Grid.Row="2" Name="exampleBox" FontSize="24" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
         <Image Grid.Row="3" VerticalAlignment="Center" Height="auto" Width="auto" Name="image" Visibility="Hidden"/>
-        <TextBox Grid.Row="4" x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>
-        
+        <TextBox Grid.Row="4" x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>-->
+
+        <Frame x:Name="CurrentGame" Source="TypingGame.xaml" Grid.Row="3" NavigationUIVisibility="Hidden">
+        </Frame>
+
         <StatusBar Grid.Row="5" Height="24">
             <StatusBarItem Height="24">
                 <TextBlock Name="lblStatus" Text=""/>
