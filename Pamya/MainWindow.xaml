@@ -15,8 +15,9 @@
         <CommandBinding Command="local:CustomCommands.MarkAsEasy" Executed="_MarkAsEasy"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.MarkAsHard" Executed="_MarkAsHard"></CommandBinding>
         <CommandBinding Command="local:CustomCommands.ToggleReviewOnly" Executed="_ToggleReviewOnly"></CommandBinding>
-        <CommandBinding Command="local:CustomCommands.ChangeGameTyping" Executed="_ChangeGameTyping"></CommandBinding>
-        <CommandBinding Command="local:CustomCommands.ChangeGameMC" Executed="_ChangeGameMC"></CommandBinding>
+        <CommandBinding Command="local:CustomCommands.ChangeGameTypingClick" Executed="_ChangeGameTypingClick"></CommandBinding>
+        <CommandBinding Command="local:CustomCommands.ChangeGameMCClick" Executed="_ChangeGameMCClick"></CommandBinding>
+        <CommandBinding Command="local:CustomCommands.ChangeGameFlashCardClick" Executed="_ChangeGameFlashCardClick"></CommandBinding>    
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Control" Command="Open"></KeyBinding>
@@ -26,7 +27,21 @@
         <KeyBinding Key="F12" Modifiers="" Command="local:CustomCommands.MarkAsHard"></KeyBinding>
         <KeyBinding Key="R" Modifiers="Control" Command="local:CustomCommands.ToggleReviewOnly"></KeyBinding>
     </Window.InputBindings>
-    
+
+    <Window.Resources>
+        <!--<Style x:Key="ButtonFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="2" StrokeThickness="1" Stroke="#60000000" StrokeDashArray="1 2" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>-->
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -53,9 +68,10 @@
                 <MenuItem x:Name="markeasy" Header="Mark as _Easy"  Command="local:CustomCommands.MarkAsEasy" InputGestureText="F9"/>
                 <MenuItem x:Name="markhard" Header="Mark as _Hard"  Command="local:CustomCommands.MarkAsHard" InputGestureText="F12"/>
             </MenuItem>
-            <MenuItem Header="Game">
-                <MenuItem x:Name="type" Header="Typing"  Command="local:CustomCommands.ChangeGameTyping"/>
-                <MenuItem x:Name="multiplechoice" Header="Multiple Choice"  Command="local:CustomCommands.ChangeGameMC"/>
+            <MenuItem Header="{DynamicResource game}">
+                <MenuItem x:Name="type" Header="{DynamicResource typegame}"  Command="local:CustomCommands.ChangeGameTypingClick"/>
+                <MenuItem x:Name="multiplechoice" Header="{DynamicResource mcgame}"  Command="local:CustomCommands.ChangeGameMCClick"/>
+                <MenuItem x:Name="flashcard" Header="{DynamicResource flashcardgame}"  Command="local:CustomCommands.ChangeGameFlashCardClick"/>
             </MenuItem>
             <MenuItem Header="{DynamicResource options}">
                 <MenuItem x:Name="ReviewOnlyMenuItem" Header="_Review Only"  IsCheckable="True" Command="local:CustomCommands.ToggleReviewOnly" InputGestureText="Ctrl+R"/>
@@ -66,12 +82,18 @@
         <Image Grid.Row="3" VerticalAlignment="Center" Height="auto" Width="auto" Name="image" Visibility="Hidden"/>
         <TextBox Grid.Row="4" x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>-->
 
-        <Frame x:Name="CurrentGame" Source="TypingGame.xaml" Grid.Row="3" NavigationUIVisibility="Hidden">
+        <Frame x:Name="CurrentGamePage" Source="TypingGame.xaml" Grid.Row="3" NavigationUIVisibility="Hidden">
         </Frame>
 
         <StatusBar Grid.Row="5" Height="24">
             <StatusBarItem Height="24">
                 <TextBlock Name="lblStatus" Text=""/>
+            </StatusBarItem>
+            <StatusBarItem Height="24" HorizontalAlignment="Right">
+                <StackPanel>
+                    <ProgressBar Name="progStatusTop" Minimum="0" Maximum="100" Width="250" Height="8" />
+                    <ProgressBar Name="progStatusBot" Minimum="0" Maximum="100" Width="250" Height="8" />
+                </StackPanel>
             </StatusBarItem>
         </StatusBar>
     </Grid>

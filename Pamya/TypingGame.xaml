@@ -18,7 +18,7 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
+        <TextBlock Grid.Row="0" Name="questionBlock" Style="{StaticResource Question}"  FontSize="32" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
         <TextBlock Grid.Row="1" Name="exampleBox" FontSize="24" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
         <Image Grid.Row="2" VerticalAlignment="Center" Height="auto" Width="auto" Name="image" Visibility="Hidden"/>
         <TextBox Grid.Row="3" x:Name="TBox" Margin="5,5,5,5" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False"/>

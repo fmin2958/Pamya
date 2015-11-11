@@ -24,11 +24,16 @@ namespace Pamya
     {
         public int correct_button;
         public Delegate _PostI;
+        public List<Button> Buttons;
         public MCGame(Delegate _PostI)
         {
             InitializeComponent();
             correct_button = 1;
             this._PostI = _PostI;
+            Buttons = new List<Button>()
+            {
+                Button1, Button2, Button3, Button4, Button5, Button6, Button7, Button8
+            };
         }
         public void ShowDeck()
         {
@@ -38,50 +43,14 @@ namespace Pamya
             questionBlock.Text = PamyaDeck.Instance.CurrentWord.question;
 
             var filler_words = PamyaDeck.Instance.CurrentDeck.RandomWords(7, PamyaDeck.Instance.CurrentWord);
-            var real_button = (new Random()).Next(1, 8);
+            correct_button = (new Random()).Next(1, 8);
 
-            correct_button = real_button;
-
-            Button1.Content = filler_words.Dequeue().answer;
-            Button2.Content = filler_words.Dequeue().answer;
-            Button3.Content = filler_words.Dequeue().answer;
-            Button4.Content = filler_words.Dequeue().answer;
-            Button5.Content = filler_words.Dequeue().answer;
-            Button6.Content = filler_words.Dequeue().answer;
-            Button7.Content = filler_words.Dequeue().answer;
-            Button8.Content = filler_words.Dequeue().answer;
-
-            switch (real_button)
+            for (int i = 0; i < Buttons.Count; i++ )
             {
-                case 1:
-                    Button1.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 2:
-                    Button2.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 3:
-                    Button3.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 4:
-                    Button4.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 5:
-                    Button5.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 6:
-                    Button6.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 7:
-                    Button7.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                case 8:
-                    Button8.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-                default:
-                    Button1.Content = PamyaDeck.Instance.CurrentWord.answer;
-                    break;
-
+                Buttons[i].Content = (i+1).ToString() + ". " + filler_words.Dequeue().answer;
             }
+
+            Buttons[correct_button - 1].Content = correct_button.ToString() + ". " + PamyaDeck.Instance.CurrentWord.answer;
         }
 
         public void _ButtonPress(object sender, RoutedEventArgs e)
@@ -107,58 +76,16 @@ namespace Pamya
                 }
 
                 //Disable all buttons except for this one
-                Button1.IsEnabled = false;
-                Button2.IsEnabled = false;
-                Button3.IsEnabled = false;
-                Button4.IsEnabled = false;
-                Button5.IsEnabled = false;
-                Button6.IsEnabled = false;
-                Button7.IsEnabled = false;
-                Button8.IsEnabled = false;
+                foreach (Button b in Buttons)
+                {
+                    b.IsEnabled = false;
+                }
 
                 button.IsEnabled = true;
 
-                switch (correct_button)
-                {
-                    case 1:
-                        Button1.Foreground = Brushes.Green;
-                        Button1.IsEnabled = true;
-                        break;
-                    case 2:
-                        Button2.Foreground = Brushes.Green;
-                        Button2.IsEnabled = true;
-                        break;
-                    case 3:
-                        Button3.Foreground = Brushes.Green;
-                        Button3.IsEnabled = true;
-                        break;
-                    case 4:
-                        Button4.Foreground = Brushes.Green;
-                        Button4.IsEnabled = true;
-                        break;
-                    case 5:
-                        Button5.Foreground = Brushes.Green;
-                        Button5.IsEnabled = true;
-                        break;
-                    case 6:
-                        Button6.Foreground = Brushes.Green;
-                        Button6.IsEnabled = true;
-                        break;
-                    case 7:
-                        Button7.Foreground = Brushes.Green;
-                        Button7.IsEnabled = true;
-                        break;
-                    case 8:
-                        Button8.Foreground = Brushes.Green;
-                        Button8.IsEnabled = true;
-                        break;
-                    default:
-                        Button1.Foreground = Brushes.Green;
-                        Button1.IsEnabled = true;
-                        break;
-                }
 
-
+                Buttons[correct_button - 1].Foreground = Brushes.Green;
+                Buttons[correct_button - 1].IsEnabled = true;
 
 
                 var img_file = PamyaDeck.Instance.CurrentDeckFolder + @"\" + PamyaDeck.Instance.CurrentWord.image_file_location;
@@ -175,23 +102,11 @@ namespace Pamya
                 TBox.Text = "";
                 TBox.IsEnabled = true;
 
-                Button1.Foreground = Brushes.Black;
-                Button2.Foreground = Brushes.Black;
-                Button3.Foreground = Brushes.Black;
-                Button4.Foreground = Brushes.Black;
-                Button5.Foreground = Brushes.Black;
-                Button6.Foreground = Brushes.Black;
-                Button7.Foreground = Brushes.Black;
-                Button8.Foreground = Brushes.Black;
-
-                Button1.IsEnabled = true;
-                Button2.IsEnabled = true;
-                Button3.IsEnabled = true;
-                Button4.IsEnabled = true;
-                Button5.IsEnabled = true;
-                Button6.IsEnabled = true;
-                Button7.IsEnabled = true;
-                Button8.IsEnabled = true;
+                foreach(Button b in Buttons)
+                {
+                    b.Foreground = Brushes.Black;
+                    b.IsEnabled = true;
+                }
 
                 //TBox.Focus();
                 exampleBox.Text = "";
@@ -203,6 +118,19 @@ namespace Pamya
 
         public bool _KeyPress(object sender, KeyEventArgs e)
         {
+            switch (e.Key)
+            {
+                case Key.D1: _ButtonPress(Button1, e); break;
+                case Key.D2: _ButtonPress(Button2, e); break;
+                case Key.D3: _ButtonPress(Button3, e); break;
+                case Key.D4: _ButtonPress(Button4, e); break;
+                case Key.D5: _ButtonPress(Button5, e); break;
+                case Key.D6: _ButtonPress(Button6, e); break;
+                case Key.D7: _ButtonPress(Button7, e); break;
+                case Key.D8: _ButtonPress(Button8, e); break;
+                default: _ButtonPress(Button1, e); break;
+            }
+
             return true;
         }
 

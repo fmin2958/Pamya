@@ -32,8 +32,8 @@ namespace InstallerPamya
                                         new File(binaries, @"..\Pamya\Resources\Localise.xaml")
                                     )
                                 ),
-                                new Dir("%Startup%",
-                                    new ExeFileShortcut(binaries, "Pamya", "[INSTALLDIR]Pamya.exe", "")),
+                                //new Dir("%Startup%",
+                                //    new ExeFileShortcut(binaries, "Pamya", "[INSTALLDIR]Pamya.exe", "")),
 
                                 new Dir(@"%ProgramMenu%\Pamya",
                                     new ExeFileShortcut(binaries, "Uninstall Pamya", "[System64Folder]msiexec.exe", "/x [ProductCode]"))       

@@ -7,7 +7,12 @@
         <system:String x:Key="exit">_Exit</system:String>
     
     <system:String x:Key="edit">_Edit</system:String>
-    
+
+    <system:String x:Key="game">_Game</system:String>
+        <system:String x:Key="typegame">_Typing Game</system:String>
+        <system:String x:Key="mcgame">_Multiple Choice Game</system:String>
+        <system:String x:Key="flashcardgame">_Flash Card Game</system:String>
+
     <system:String x:Key="options">_Options</system:String>
         <system:String x:Key="card">_Card</system:String>
         <system:String x:Key="deck">_Deck</system:String>

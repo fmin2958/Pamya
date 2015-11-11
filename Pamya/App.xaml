@@ -7,6 +7,20 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Localise.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="#FFD6D6D6" />
+                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="FontFamily" Value="Georgia"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}" x:Key="Question">
+                <Setter Property="FontSize" Value="32" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="FontFamily" Value="Georgia"/>
+            </Style>
+            <Style TargetType="{x:Type Frame}">
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

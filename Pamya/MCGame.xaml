@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Pamya"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
 	Title="MCGame">
@@ -12,14 +13,14 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Name="questionBlock" FontSize="32" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}">
+        <TextBlock Grid.Row="0" Name="questionBlock" Style="{StaticResource Question}" FontSize="32" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}">
         </TextBlock>
         <TextBlock Grid.Row="1" Name="exampleBox" FontSize="24" TextWrapping="Wrap" Margin="10,10,10,10" Text = "{Binding LongText}"></TextBlock>
         <Image Grid.Row="2" VerticalAlignment="Center" Height="auto" Width="auto" Name="image" Visibility="Hidden"/>
@@ -36,17 +37,17 @@
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
-            <Button Grid.Column="0" Grid.Row="0" x:Name="Button1" Margin="5,5,5,5" FontSize="32" Content="Button 1" Click="_ButtonPress"></Button>
-            <Button Grid.Column="1" Grid.Row="0" x:Name="Button2" Margin="5,5,5,5" FontSize="32" Content="Button 2" Click="_ButtonPress"></Button>
+            <Button Grid.Column="0" Grid.Row="0" x:Name="Button1" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 1" Click="_ButtonPress"></Button>
+            <Button Grid.Column="1" Grid.Row="0" x:Name="Button2" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 2" Click="_ButtonPress"></Button>
 
-            <Button Grid.Column="0" Grid.Row="1" x:Name="Button3" Margin="5,5,5,5" FontSize="32" Content="Button 3" Click="_ButtonPress"></Button>
-            <Button Grid.Column="1" Grid.Row="1" x:Name="Button4" Margin="5,5,5,5" FontSize="32" Content="Button 4" Click="_ButtonPress"></Button>
+            <Button Grid.Column="0" Grid.Row="1" x:Name="Button3" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 3" Click="_ButtonPress"></Button>
+            <Button Grid.Column="1" Grid.Row="1" x:Name="Button4" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 4" Click="_ButtonPress"></Button>
 
-            <Button Grid.Column="0" Grid.Row="2" x:Name="Button5" Margin="5,5,5,5" FontSize="32" Content="Button 5" Click="_ButtonPress"></Button>
-            <Button Grid.Column="1" Grid.Row="2" x:Name="Button6" Margin="5,5,5,5" FontSize="32" Content="Button 6" Click="_ButtonPress"></Button>
+            <Button Grid.Column="0" Grid.Row="2" x:Name="Button5" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 5" Click="_ButtonPress"></Button>
+            <Button Grid.Column="1" Grid.Row="2" x:Name="Button6" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 6" Click="_ButtonPress"></Button>
 
-            <Button Grid.Column="0" Grid.Row="3" x:Name="Button7" Margin="5,5,5,5" FontSize="32" Content="Button 7" Click="_ButtonPress"></Button>
-            <Button Grid.Column="1" Grid.Row="3" x:Name="Button8" Margin="5,5,5,5" FontSize="32" Content="Button 8" Click="_ButtonPress"></Button>
+            <Button Grid.Column="0" Grid.Row="3" x:Name="Button7" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 7" Click="_ButtonPress"></Button>
+            <Button Grid.Column="1" Grid.Row="3" x:Name="Button8" Margin="5,5,5,5" FontSize="32" HorizontalContentAlignment="Left" Content="Button 8" Click="_ButtonPress"></Button>
         </Grid>
 
         <TextBox Grid.Row="4" x:Name="TBox" Margin="0" VerticalAlignment="Bottom" Text="" FontSize="32" AcceptsReturn="False" Visibility="Collapsed"/>
