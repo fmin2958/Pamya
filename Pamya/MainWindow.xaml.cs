@@ -491,7 +491,7 @@ namespace Pamya
         public void UpdateStatusBar()
         {
             var time_due = EpochTime.AddToEpoch(PamyaDeck.Instance.CurrentWord.time_due);
-            lblStatus.Text = "EF: " + PamyaDeck.Instance.CurrentWord.EF.ToString() + "; n: " + PamyaDeck.Instance.CurrentWord.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToLongDateString() + " " + time_due.ToLocalTime().ToLongTimeString() + "; RevOnly: " + PamyaDeck.Instance.bReviewOnly.ToString();
+            lblStatus.Text = "EF: " + PamyaDeck.Instance.CurrentWord.EF.ToString() + "; n: " + PamyaDeck.Instance.CurrentWord.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToString(@"yyyy-MM-dd hh\:mm\:ss") + "; RevOnly: " + PamyaDeck.Instance.bReviewOnly.ToString();
             progStatusTop.Value = PamyaDeck.Instance.CurrentDeck.GetProgressPercentNow();
             progStatusBot.Value = PamyaDeck.Instance.CurrentDeck.GetProgressPercentFull();
         }
@@ -581,7 +581,6 @@ namespace Pamya
         private void _ChangeGameTypingClick(object sender, RoutedEventArgs e)
         {
             _ChangeGameTyping();
-            UpdateStatusBar();
         }
 
         public void _ChangeGameTyping()
@@ -589,12 +588,12 @@ namespace Pamya
             PamyaDeck.Instance.CurrentGame = new TypingGame();
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
             PamyaDeck.Instance.CurrentGame.ShowDeck();
+            UpdateStatusBar();
         }
 
         private void _ChangeGameMCClick(object sender, RoutedEventArgs e)
         {
             _ChangeGameMC();
-            UpdateStatusBar();
         }
 
         public void _ChangeGameMC()
@@ -602,12 +601,12 @@ namespace Pamya
             PamyaDeck.Instance.CurrentGame = new MCGame(new _PostI(_PostInteraction));
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
             PamyaDeck.Instance.CurrentGame.ShowDeck();
+            UpdateStatusBar();
         }
 
         private void _ChangeGameFlashCardClick(object sender, RoutedEventArgs e)
         {
             _ChangeGameFlashCard();
-            UpdateStatusBar();
         }
 
         public void _ChangeGameFlashCard()
@@ -615,6 +614,7 @@ namespace Pamya
             PamyaDeck.Instance.CurrentGame = new FlashCardGame(new _PostI(_PostInteraction));
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
             PamyaDeck.Instance.CurrentGame.ShowDeck();
+            UpdateStatusBar();
         }
 
 
