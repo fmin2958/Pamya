@@ -409,6 +409,13 @@ namespace Pamya
             progStatusBot.Value = PamyaDeck.Instance.CurrentDeck.GetProgressPercentFull();
         }
 
+        public void ClearStatusBar()
+        {
+            lblStatus.Text = "";
+            progStatusTop.Value = 0;
+            progStatusBot.Value = 0;
+        }
+
         private void _EditCardDialog(object sender, RoutedEventArgs e)
         {
             var edit_window = new EditCardWindow(PamyaDeck.Instance.CurrentWord);
@@ -483,6 +490,7 @@ namespace Pamya
             PamyaDeck.Instance.CurrentGame = new MainMenu();
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
             ShowDeck();
+            ClearStatusBar();
         }
 
         private void _ChangeGameTypingClick(object sender, RoutedEventArgs e)
