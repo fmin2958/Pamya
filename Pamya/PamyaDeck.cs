@@ -147,6 +147,8 @@ namespace Pamya
 
         public void ShowDeck()
         {
+            //Ideally we want to control what goes on with the deck here, so we will pick a card from the deck, then pass it onto the game, then call the appropriate stuff
+            CurrentWord = CurrentDeck.GetNextWord(bReviewOnly);
             CurrentGame.ShowDeck();
         }
 
@@ -157,7 +159,7 @@ namespace Pamya
 
         public void _OpenDeck(string FileName, int GameType)
         {
-            //this.Title = "Pamya - " + fname;
+            //this.Title = "Pamya - " + fname; //FIXME
             CurrentDeckFolder = DecksFolder + @"\" + FileName;
             DeckFile = CurrentDeckFolder + @"\deck.sqlite";
 
@@ -180,7 +182,7 @@ namespace Pamya
             SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
             SQLiteDataReader deck_reader = command.ExecuteReader();
 
-            PamyaDeck.Instance.CurrentDeck = new Deck();
+            CurrentDeck = new Deck();
 
 
             while (deck_reader.Read())
@@ -203,7 +205,7 @@ namespace Pamya
                     word.studied = Convert.ToBoolean(user_reader["studied"]);
                     word.time_due = Convert.ToInt32(user_reader["timedue"]);
                     user_reader.Close();
-                    PamyaDeck.Instance.CurrentDeck.AddWord(word);
+                    CurrentDeck.AddWord(word);
                 }
                 catch (Exception ex)
                 {

@@ -579,7 +579,7 @@ namespace Pamya
         {
             PamyaDeck.Instance.CurrentGame = new MainMenu();
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
-            PamyaDeck.Instance.CurrentGame.ShowDeck();
+            ShowDeck();
         }
 
         private void _ChangeGameTypingClick(object sender, RoutedEventArgs e)
@@ -591,8 +591,7 @@ namespace Pamya
         {
             PamyaDeck.Instance.CurrentGame = new TypingGame();
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
-            PamyaDeck.Instance.CurrentGame.ShowDeck();
-            UpdateStatusBar();
+            ShowDeck();
         }
 
         private void _ChangeGameMCClick(object sender, RoutedEventArgs e)
@@ -604,8 +603,7 @@ namespace Pamya
         {
             PamyaDeck.Instance.CurrentGame = new MCGame(new _PostI(_PostInteraction));
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
-            PamyaDeck.Instance.CurrentGame.ShowDeck();
-            UpdateStatusBar();
+            ShowDeck();
         }
 
         private void _ChangeGameFlashCardClick(object sender, RoutedEventArgs e)
@@ -617,8 +615,7 @@ namespace Pamya
         {
             PamyaDeck.Instance.CurrentGame = new FlashCardGame(new _PostI(_PostInteraction));
             CurrentGamePage.Navigate(PamyaDeck.Instance.CurrentGame);
-            PamyaDeck.Instance.CurrentGame.ShowDeck();
-            UpdateStatusBar();
+            ShowDeck();
         }
 
 

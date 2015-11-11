@@ -29,7 +29,6 @@ namespace Pamya
 
         public void ShowDeck()
         {
-            PamyaDeck.Instance.CurrentWord = PamyaDeck.Instance.CurrentDeck.GetNextWord(PamyaDeck.Instance.bReviewOnly);
             questionBlock.Text = PamyaDeck.Instance.CurrentWord.question;
         }
 
