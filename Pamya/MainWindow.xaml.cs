@@ -491,7 +491,7 @@ namespace Pamya
         public void UpdateStatusBar()
         {
             var time_due = EpochTime.AddToEpoch(PamyaDeck.Instance.CurrentWord.time_due);
-            lblStatus.Text = "EF: " + PamyaDeck.Instance.CurrentWord.EF.ToString() + "; n: " + PamyaDeck.Instance.CurrentWord.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToString(@"yyyy-MM-dd hh\:mm\:ss") + "; RevOnly: " + PamyaDeck.Instance.bReviewOnly.ToString();
+            lblStatus.Text = "EF: " + PamyaDeck.Instance.CurrentWord.EF.ToString() + "; n: " + PamyaDeck.Instance.CurrentWord.n.ToString() + "; Time Due Next: " + time_due.ToLocalTime().ToString(@"yyyy-MM-dd H\:mm\:ss") + "; RevOnly: " + PamyaDeck.Instance.bReviewOnly.ToString();
             progStatusTop.Value = PamyaDeck.Instance.CurrentDeck.GetProgressPercentNow();
             progStatusBot.Value = PamyaDeck.Instance.CurrentDeck.GetProgressPercentFull();
         }
