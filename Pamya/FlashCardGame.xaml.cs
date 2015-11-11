@@ -82,7 +82,7 @@ namespace Pamya
 
             exampleBox.Text = "";
             image.Visibility = Visibility.Hidden;
-            ShowDeck();
+            PamyaDeck.Instance.ShowDeck();
             _PostI.DynamicInvoke();
         }
 
