@@ -364,7 +364,11 @@ namespace Pamya
 
             //Done in the game
             //questionBlock.Text = current_word.question;
-            PamyaDeck.Instance.CurrentGame.ShowDeck();
+
+            //PamyaDeck.Instance.CurrentGame.ShowDeck();
+
+            PamyaDeck.Instance.ShowDeck();
+
 
             //done here
             UpdateStatusBar();

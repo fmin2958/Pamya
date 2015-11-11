@@ -144,6 +144,12 @@ namespace Pamya
             }
         }
 
+
+        public void ShowDeck()
+        {
+            CurrentGame.ShowDeck();
+        }
+
         public void _OpenDialog(object sender, RoutedEventArgs e)
         {
             GameChangeDelegates[0].DynamicInvoke(); //This is the mainmenu opening delegate
