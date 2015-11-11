@@ -76,21 +76,11 @@ namespace Pamya
 
     public partial class MainWindow : Window
     {
-        //public GameInterface current_game;
-        //public Deck current_deck;
-        //private Word current_word;
         private string filename;
-        //private string app_data_folder;
-        //private string ideckfolder;
-        //private string ideckfile;
-        //private string iuserfile;
+
         public delegate void _PostI();
         public delegate void _GameTypeDelegate();
 
-
-        //private string espeak_binary_location;
-
-        //private Boolean _review_only;
         public MainWindow()
         {
             PamyaDeck.Instance.CurrentDeck = new Deck();
@@ -182,77 +172,6 @@ namespace Pamya
         {
             PamyaDeck.Instance._OpenDialog(sender, e);
         }
-
-        /*private void _OpenDialog(object sender, RoutedEventArgs e)
-        {
-            var open_file_dialog = new OpenDeckWindow();
-            //open_file_dialog.InitialDirectory = app_data_folder + @"\Links";
-            if (open_file_dialog.ShowDialog() == true)
-            {
-                //var fname = System.IO.Path.GetFileNameWithoutExtension(open_file_dialog.FileName);
-                var fname = open_file_dialog.FileName;
-                this.Title = "Pamya - " + fname;
-                ideckfolder = app_data_folder + @"\Decks\" + fname;
-                PamyaDeck.Instance.CurrentDeckFolder = ideckfolder;
-                ideckfile = ideckfolder + @"\deck.sqlite";
-                iuserfile = ideckfolder + @"\userdata.sqlite";
-
-                SQLiteConnection deckdbcon;
-                deckdbcon =
-                new SQLiteConnection("Data Source=" + ideckfile + ";Version=3;");
-                deckdbcon.Open();
-
-
-                SQLiteConnection userdbcon;
-                userdbcon =
-                new SQLiteConnection("Data Source=" + iuserfile + ";Version=3;");
-                userdbcon.Open();
-
-                string sql = "SELECT * FROM deck ORDER BY id ASC";
-                SQLiteCommand command = new SQLiteCommand(sql, deckdbcon);
-                SQLiteDataReader deck_reader = command.ExecuteReader();
-
-                PamyaDeck.Instance.CurrentDeck = new Deck();
-
-                
-                while (deck_reader.Read())
-                {
-                    var word = new Word(deck_reader["question"].ToString(),deck_reader["answer"].ToString());
-                    word.id = Convert.ToInt32(deck_reader["id"]);
-                    word.wav_file_loc = deck_reader["wavfileloc"].ToString();
-                    word.guid = deck_reader["guid"].ToString();
-                    word.example = deck_reader["example"].ToString();
-                    word.image_file_location = deck_reader["imagefileloc"].ToString();
-                    var user_sql = "SELECT * FROM deck WHERE guid='" + deck_reader["guid"].ToString() + "'";
-                    var user_command = new SQLiteCommand(user_sql, userdbcon);
-                    try
-                    {
-                        var user_reader = user_command.ExecuteReader();
-                        user_reader.Read();
-                        word.EF = Convert.ToDouble(user_reader["ef"]);
-                        word.I = Convert.ToDouble(user_reader["i"]);
-                        word.n = Convert.ToInt32(user_reader["n"]);
-                        word.studied = Convert.ToBoolean(user_reader["studied"]);
-                        word.time_due = Convert.ToInt32(user_reader["timedue"]);
-                        user_reader.Close();
-                        PamyaDeck.Instance.CurrentDeck.AddWord(word);
-                    } catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-
-                }
-                ShowDeck();
-
-                deck_reader.Close();
-
-                userdbcon.Close();
-                deckdbcon.Close();
-
-            }
-            
-                
-        }*/
 
         //DANGEROUS DO NOT USE
         private void _ImportDialog(object sender, RoutedEventArgs e)
@@ -360,17 +279,7 @@ namespace Pamya
 
         private void ShowDeck()
         {
-
-
-            //Done in the game
-            //questionBlock.Text = current_word.question;
-
-            //PamyaDeck.Instance.CurrentGame.ShowDeck();
-
             PamyaDeck.Instance.ShowDeck();
-
-
-            //done here
             UpdateStatusBar();
         }
 
@@ -547,12 +456,6 @@ namespace Pamya
                 deckdbcon.Close();
                 userdbcon.Close();
 
-                //add and update all other words
-                //foreach(Word w in edit_deck_window.deck.dc)
-                //{
-                //    UpdateDeckDB(w);
-                //    UpdateUserDB(w);
-                //}
                 UpdateDeckDB(edit_deck_window.deck.dc);
                 UpdateUserDB(edit_deck_window.deck.dc);
 
