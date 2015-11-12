@@ -29,6 +29,10 @@ namespace Pamya
             InitializeComponent();
         }
 
+        public float GameStudyMultiplier()
+        {
+            return 4.5f;
+        }
 
         public void ShowDeck()
         {

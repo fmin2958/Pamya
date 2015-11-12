@@ -35,6 +35,12 @@ namespace Pamya
                 Button1, Button2, Button3, Button4, Button5, Button6, Button7, Button8
             };
         }
+
+        public float GameStudyMultiplier()
+        {
+            return 2.5f;
+        }
+
         public void ShowDeck()
         {
             questionBlock.Text = PamyaDeck.Instance.CurrentWord.question;
@@ -108,6 +114,8 @@ namespace Pamya
                 //TBox.Focus();
                 exampleBox.Text = "";
                 image.Visibility = Visibility.Hidden;
+
+                //Rework So that this is done automatically
                 PamyaDeck.Instance.ShowDeck();
             }
             _PostI.DynamicInvoke();
@@ -118,7 +126,6 @@ namespace Pamya
             List<Key> keys = new List<Key>() { Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8 };
             int number;
             try { number = keys.FindIndex(a => a == e.Key); }
-
             catch (System.ArgumentNullException) { number = -1; }
             if (number >= 0)
                 _ButtonPress(Buttons[number], e);

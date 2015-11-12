@@ -51,6 +51,11 @@ namespace Pamya
             GameType.SelectedIndex = 0;
         }
 
+        public float GameStudyMultiplier()
+        {
+            return 0.0f;
+        }
+
         public void _KeyPress(object sender, KeyEventArgs e)
         {
 

@@ -28,6 +28,11 @@ namespace Pamya
             this._PostI = _PostI;
         }
 
+        public float GameStudyMultiplier()
+        {
+            return 2.0f;
+        }
+
         public void ShowDeck()
         {
             questionBlock.Text = PamyaDeck.Instance.CurrentWord.question;

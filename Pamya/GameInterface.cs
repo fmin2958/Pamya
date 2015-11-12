@@ -10,7 +10,7 @@ namespace Pamya
 {
     public interface GameInterface
     {
-        //void setPostInteractionFunc(Delegate _PostI);
+        float GameStudyMultiplier();
         void ShowDeck();
         void _KeyPress(object sender, KeyEventArgs e);
         void _EditCard();

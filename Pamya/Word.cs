@@ -91,8 +91,8 @@ namespace Pamya
 
         private uint editDistance(string s, string t)
         {
-            s = s.ToLower();
-            t = t.ToLower();
+            s = s.ToLower().Trim();
+            t = t.ToLower().Trim();
             int m = s.Length;
             int n = t.Length;
             uint[,] d = new uint[m + 1, n + 1];
@@ -187,7 +187,7 @@ namespace Pamya
         public void SetNextDueDate()
         {
             int secondsSinceEpoch = EpochTime.GetAsInt();
-            time_due = secondsSinceEpoch + Convert.ToInt32(I * 60 * 4.5);
+            time_due = secondsSinceEpoch + Convert.ToInt32(I * 60 * PamyaDeck.Instance.CurrentGame.GameStudyMultiplier()); //4.5 Typing Game
         }
 
         public void MarkAsEasy()
