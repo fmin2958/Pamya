@@ -113,7 +113,7 @@ namespace Pamya
             _PostI.DynamicInvoke();
         }
 
-        public bool _KeyPress(object sender, KeyEventArgs e)
+        public void _KeyPress(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -127,8 +127,6 @@ namespace Pamya
                 case Key.D8: _ButtonPress(Button8, e); break;
                 default: _ButtonPress(Button1, e); break;
             }
-
-            return true;
         }
 
         public void _EditCard()

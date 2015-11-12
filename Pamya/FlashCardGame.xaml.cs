@@ -46,9 +46,9 @@ namespace Pamya
             }
         }
 
-        public bool _KeyPress(object sender, KeyEventArgs e)
+        public void _KeyPress(object sender, KeyEventArgs e)
         {
-            return true;
+            
         }
 
         private void ShowThreeButtons()

@@ -51,9 +51,9 @@ namespace Pamya
             GameType.SelectedIndex = 0;
         }
 
-        public bool _KeyPress(object sender, KeyEventArgs e)
+        public void _KeyPress(object sender, KeyEventArgs e)
         {
-            return true;
+
         }
 
         public void _EditCard()

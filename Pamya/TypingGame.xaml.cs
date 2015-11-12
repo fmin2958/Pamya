@@ -17,7 +17,10 @@ using System.IO;
 namespace Pamya
 {
     /// <summary>
-    /// Interaction logic for MainGame.xaml
+    /// Interaction logic for TypingGame.xaml
+    /// So the Typing Game is supposed to be a game that, on any given word forced the user to type a response.
+    /// That response is taken an processed for correctness. 
+    /// Closeness to the response determines how the word is handled.
     /// </summary>
     public partial class TypingGame : Page, GameInterface
     {
@@ -32,12 +35,19 @@ namespace Pamya
             questionBlock.Text = PamyaDeck.Instance.CurrentWord.question;
         }
 
-        public bool _KeyPress(object sender, KeyEventArgs e)
+        private void ResetAnswerTextBox()
+        {
+            TBox.Text = "";
+            TBox.IsEnabled = true;
+            TBox.Foreground = Brushes.Black;
+            TBox.Focus();
+        }
+
+        public void _KeyPress(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 //do something if 'enter' key is pressed.
-                //MessageBox.Show("Boom");
                 if (TBox.IsEnabled == true)
                 {
                     TBox.IsEnabled = false;
@@ -62,22 +72,17 @@ namespace Pamya
 
                     SpeechPlayer.SpeakWord(PamyaDeck.Instance.CurrentWord);
 
-
-                    return true;
                 }
                 else
-                {
-                    TBox.Text = "";
-                    TBox.IsEnabled = true;
-                    TBox.Foreground = Brushes.Black;
-                    TBox.Focus();
+                {   
+                    ResetAnswerTextBox();
+
                     exampleBox.Text = "";
                     image.Visibility = Visibility.Hidden;
+
                     PamyaDeck.Instance.ShowDeck();
-                    return false;
                 }
             }
-            return false;
         }
 
         public void _EditCard()

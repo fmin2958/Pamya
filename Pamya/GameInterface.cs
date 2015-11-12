@@ -12,7 +12,7 @@ namespace Pamya
     {
         //void setPostInteractionFunc(Delegate _PostI);
         void ShowDeck();
-        bool _KeyPress(object sender, KeyEventArgs e);
+        void _KeyPress(object sender, KeyEventArgs e);
         void _EditCard();
     }
 }
