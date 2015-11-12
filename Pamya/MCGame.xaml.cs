@@ -115,18 +115,13 @@ namespace Pamya
 
         public void _KeyPress(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
-            {
-                case Key.D1: _ButtonPress(Button1, e); break;
-                case Key.D2: _ButtonPress(Button2, e); break;
-                case Key.D3: _ButtonPress(Button3, e); break;
-                case Key.D4: _ButtonPress(Button4, e); break;
-                case Key.D5: _ButtonPress(Button5, e); break;
-                case Key.D6: _ButtonPress(Button6, e); break;
-                case Key.D7: _ButtonPress(Button7, e); break;
-                case Key.D8: _ButtonPress(Button8, e); break;
-                default: _ButtonPress(Button1, e); break;
-            }
+            List<Key> keys = new List<Key>() { Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8 };
+            int number;
+            try { number = keys.FindIndex(a => a == e.Key); }
+
+            catch (System.ArgumentNullException) { number = -1; }
+            if (number >= 0)
+                _ButtonPress(Buttons[number], e);
         }
 
         public void _EditCard()
